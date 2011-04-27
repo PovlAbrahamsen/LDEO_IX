@@ -1,7 +1,7 @@
 %======================================================================
 %                    D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Mon Oct 18 15:46:28 2010
+%                    dlm: Wed Apr 27 11:05:37 2011
 %                    (c) 2004 ladcp@
 %                    uE-Info: 28 45 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
@@ -25,7 +25,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_6';
+p.software='LDEO LADCP software: Version IX_7';
 
 % file names
 % f.ladcpdo  is the ONLY required input
