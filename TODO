@@ -1,0 +1,54 @@
+======================================================================
+                    T O D O 
+                    doc: Thu Apr 14 12:12:48 2011
+                    dlm: Thu Apr 14 12:17:34 2011
+                    (c) 2011 A.M. Thurnherr
+                    uE-Info: 55 0 NIL 0 0 72 3 2 4 NIL ofnI
+======================================================================
+
+=Known Bugs=
+
+-Oct 18, 2010, IX_6-
+
+Description: When the up- and downlooker data files are switched, the
+code does not work cleanly as apparent in the figs (e.g. fig. 14) and
+evidenced by the fact that BT does not work. 
+
+Workaround: Don't switch the data files.
+
+Severity: Low.
+
+
+-Apr 14, 2011, IX_6-
+
+Description, as reported by David Smeed: When processing data with
+Matlab 2009a and printing on A4 paper some plots extend off the paper.
+
+Workaround, as reported by David: changing "print -dpsc" to  "print
+-depsc" in "process_cast.m"
+
+Severity: Medium.
+
+
+-Apr 14, 2011, IX_6-
+
+Description, as reported by David Smeed: Cast end position is
+incorrectly assumed at 0N 0W when cast is processed with GPS but no CTD
+data.
+
+Workaround: don't process LADCP data without CTD
+
+Severity: Low.
+
+======================================================================
+
+=Possible Improvements=
+
+
+- change all (mag)dev to magdecl (scripts, variables, log-file output,
+  howto)
+
+- add Fig.11 warnings when a data set the name of which is specified is not
+  used
+
+- remove most of the diagnostic output

@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Mon Jan  3 02:02:32 2011
+                    dlm: Wed Apr 27 11:06:33 2011
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 162 56 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 164 68 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -157,6 +157,11 @@ IX_6:
 		- pulled newest geomag version
 		- cleaned up history for first Mercurial version
 
-IX_6a:		
+IX_7:		
 	Jan  3, 2011:
 		- changed IGRF11 validity to 2015 in [loadnav.m]
+	Apr 14, 2011:
+		- added TODO file with known bugs and potential improvements
+	Apr 27, 2011:
+		- updated version in [default.m] to IX_7
+		- publised on Mercurial server
