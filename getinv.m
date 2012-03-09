@@ -8,9 +8,9 @@ function [p,dr,ps,de,der]=getinv(di,p,ps,dr,iplot)
 %======================================================================
 %                    G E T I N V . M 
 %                    doc: Thu Jun 17 15:36:21 2004
-%                    dlm: Wed Aug 25 02:04:54 2010
+%                    dlm: Fri Jan  6 11:57:45 2012
 %                    (c) 2004 ladcp@
-%                    uE-Info: 988 0 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 31 50 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGE HISTORY:
@@ -25,6 +25,10 @@ function [p,dr,ps,de,der]=getinv(di,p,ps,dr,iplot)
 %		       (and corresponding velocities removed) even
 %		       on sadcpfac=0, i.e. when SADCP data were only
 %		       used for plotting
+% Jun 29, 2011: - pass ps to geterr to allow controlling fig. 3
+% Jan  6, 2012: - lesqchol removed because it does not deal with
+%		  nearly singular matrices gracefully
+%		- BUG: replaced all imag() by new imagnan()
 
 if nargin<5, iplot=0; end
 
@@ -364,7 +368,7 @@ if exist('bvel','var')
   if length(ubot)>0
    dr.zbot=z(iubot);
    dr.ubot=real(ubot(:,1));
-   dr.vbot=imag(ubot(:,1));
+   dr.vbot=imagnan(ubot(:,1));
    dr.uerrbot=ubot(:,2);
    % make length of array unique
    while length(dr.zbot)==nt | length(dr.zbot)==nz 
@@ -508,7 +512,7 @@ disp(['         (ocean vel)  length of A2: ',num3str(a2l,6,0)])
 % save results in output array
 dr.z=z;
 dr.u=real(uocean(:,1));
-dr.v=imag(uocean(:,1));
+dr.v=imagnan(uocean(:,1));
 if size(uocean,2)>1
  dr.uerr=(uocean(:,2));
 end
@@ -523,12 +527,12 @@ if sum(isfinite(slat+slon))>0 | ps.dragfac>0
  dr.xship=(slon-slon(1))*60*1852*cos(meannan(slat)*pi/180);
  dr.yship=(slat-slat(1))*60*1852;
  dr.uship=real(shipvel);
- dr.vship=imag(shipvel);
+ dr.vship=imagnan(shipvel);
 end
 dr.zctd=zctd;
 dr.wctd=-wctd;
 dr.uctd=-real(uctd(:,1))';
-dr.vctd=-imag(uctd(:,1))';
+dr.vctd=-imagnan(uctd(:,1))';
 if size(uctd,2)>1
  dr.uctderr=(uctd(:,2))';
 end
@@ -537,14 +541,14 @@ dt=diff(tim)*24*3600;
 dt=mean([0,dt;dt,0]);
 ctdpos=-cumsum(uctd(:,1).*dt').';
 dr.xctd=real(ctdpos);
-dr.yctd=imag(ctdpos);
+dr.yctd=imagnan(ctdpos);
 
 figure(7)
 clf
 orient tall
  tim=dr.tim-fix(dr.tim(1));
  uctd_drag=real(ctdvel);
- vctd_drag=imag(ctdvel);
+ vctd_drag=imagnan(ctdvel);
  % plot some of the drag fac results
  subplot(421)
  plot(tim,dr.uctd,'-b','linewidth',1.8)
@@ -641,7 +645,7 @@ orient tall
  pause(0.01)
 
  % compute velcoity error
- der=geterr(dr,di,iplot);
+ der=geterr(ps,dr,di,iplot);
  if size(uocean,2)>1					% second pass: uerr is set
  							% note that dr.uerr is entirely re-scaled %%##%%
   dr.uerr=dr.uerr/medianan(dr.uerr)*medianan(sqrt(der.u_oce_s.^2+der.v_oce_s.^2));
@@ -730,7 +734,7 @@ if ps.down_up
   uocean_do(ii)=NaN;
  end
  dr.u_do=real(uocean_do(:,1));
- dr.v_do=imag(uocean_do(:,1));
+ dr.v_do=imagnan(uocean_do(:,1));
 
 
  if length(iupc)>5, 
@@ -764,7 +768,7 @@ if ps.down_up
   uocean_up=uocean_do*NaN;
  end
  dr.u_up=real(uocean_up(:,1));
- dr.v_up=imag(uocean_up(:,1));
+ dr.v_up=imagnan(uocean_up(:,1));
 
  u_bias = meannan(dr.u_do-dr.u_up);
  v_bias = meannan(dr.v_do-dr.v_up);
@@ -864,8 +868,6 @@ if nargout>3
  Ab(:,id)=[];
  if length(ibot)>1
   % solve
-  %[ubot,uebot]=lesqfit(dbot,Ab);
-  % ubot=lesqchol(dbot,Ab);
   [m,me]=lesqfit(dbot,Ab);
   ubot=[full(m),abs(full(me))];
   velerr=min(abs(full(me)));
@@ -978,14 +980,14 @@ if sadcpfac>0
   
    ds.z_sadcp=zsadcp(iok);
    ds.u_sadcp=real(dsadcp(iok));
-   ds.v_sadcp=imag(dsadcp(iok));
+   ds.v_sadcp=imagnan(dsadcp(iok));
    ds.uerr_sadcp=verr(iok);
   end % nargout <= 3
 else % sadcpfac <= 0
   if nargout>3
    ds.z_sadcp=zsadcp;
    ds.u_sadcp=real(dsadcp);
-   ds.v_sadcp=imag(dsadcp);
+   ds.v_sadcp=imagnan(dsadcp);
    ds.uerr_sadcp=verr;
   end
 end
@@ -1170,14 +1172,14 @@ d(lt)=0;
 function [uocean,uctd,uoceanerr,uctderr]=lainsolv(Aocean,Actd,dladcp,nsolve);
 %function [uocean,uctd,uoceanerr,uctderr]=lainsolv(Aocean,Actd,dladcp,nsolve);
 % 
-% solve LADCP current profiling using an invers technique.
+% solve LADCP current profiling using an inverse technique.
 % dladcp = [Aocean,Actd] * [uocean,uctd]
 % 
 % nsolve = 0  Cholseky transform
 %        = 1  Moore Penrose Inverse
 %
 %   Martin Visbeck LDEO 15/12/1998
-%   need LESQFIT and LESQCHOL routines
+%   need LESQFIT routine
 %
 
 if nargin<4, nsolve=0; end
@@ -1196,8 +1198,8 @@ if nsolve==1
  [m,me]=lesqfit(d,A);
  me=full(me);
 else
- disp('Cholesky transform')
- m=lesqchol(d,A);
+  disp('Moore-Penrose inverse w/o errors')
+  m=lesqfit(d,A);
 end
 
 % split results up 
@@ -1240,31 +1242,6 @@ d=d.*w;
 Ao=Ao.*sparse(ii,io,w);
 Ac=Ac.*sparse(ii,ic,w);
 
-%-------------------------------------------------------------------
-function [m,dm,c]=lesqchol(d,g)
-% function [m,dm,c]=lesqcholw(d,g)
-
-% fit least squares method to linear problem 
-% Use Cholesky transform
-% 
-%input parameters:
-%  d:= data vector ;  g:= model matrix 
-% output parameters:
-% m=model factors; dm= model data, c=correlation 
-
-n=length(d);
-[i,j]=size(g);
-if i~=n; disp(' wrong arguments'),return,end
-[r,b] = chol( g.' * g);
-if b~=0, m=g(1,:)'+NaN; dm=d+NaN; c=NaN; return, end
-y = forwardsub(r.' , g.' * d);
-m  = backsub(r,y);
-if nargout<2, return, end
-dm = g * m;
-if nargout<3, return, end
-co = cov([d,dm]);
-c  = co(1,2) / sqrt( co(1,1)*co(2,2) );
- 
 %-------------------------------------------------------------------
 function [m,me,c,dm,gi]=lesqfit(d,g)
 % function [m,me,c,dm,gi]=lesqfit(d,g)

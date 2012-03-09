@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Wed Oct 28 11:23:27 2009
+%                    dlm: Thu Aug 18 17:20:09 2011
 %                    (c) 2004 ladcp@
-%                    uE-Info: 1574 0 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 46 76 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -40,6 +40,10 @@ function [d,p,de]=loadrdi(f,p)
 %  Nov 18, 2007: - added code for p.allow_3beam_solutions, p.ignore_beam
 %  Jan  7, 2009: - tightened use of exist()
 %  Oct 28, 2009: - modified p.ignore_beam for dual-head systems
+%  Jun 27, 2011: - l.blen removed because bin lenght can be different for UL & DL
+%		 - apparently unused z-variable commented out
+%  Jun 30, 2011: - buggy bin-remapping disabled
+%  Aug 18, 2011: - added comment to coord-transformation code (gimbal pitch)
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -587,7 +591,7 @@ function [l,message,le] = updown(fdown,fup,pglim,elim,...
 %  L = UPDOWN('filedown','fileup') reads ADCP raw data from the specified
 %  files. L is a structure array with the following fields:
 %
-%    blen: bin length
+%    blen: bin length		%%% ANT: REMOVED 2011/06/28 BECAUSE IT CAN BE DIFFERENT FOR UL/DL
 %    nbin: number of bins
 %    blnk: blank after transmit
 %    dist: distance of bin 1 from transducer
@@ -848,7 +852,7 @@ if up
 end
 
 % distance vectors
-z = fd(f.dist) + fd(f.blen)*([1:fd(f.nbin)] - 1);
+%%% z = fd(f.dist) + fd(f.blen)*([1:fd(f.nbin)] - 1);	% unused?! ANT 2011/06/28
 if bmax(1)>0, fd(f.nbin)=bmax(1); end
 idb=1:fd(f.nbin);
 
@@ -945,7 +949,6 @@ if up
   l.npng_d = fd(f.npng);
   l.nens_u = size(vu,1);
   l.nens_d = size(vd,1);
-  l.blen = fd(f.blen);
   l.nbin = fd(f.nbin);
   l.blnk = fd(f.blnk);
   l.dist = fd(f.dist);
@@ -1011,11 +1014,10 @@ if up
   l.problem = [fliplr(uproblem(iu,:)) dproblem(id,:)]';
   l.problemb = problemb(id,:)';
 
-else
+else % single instrument
 
   l.zd=[0:(fd(f.nbin)-1)]*fd(f.blen)+fd(f.dist);
   eval(['l.serial_cpu_d=fd(',f.serial,');']);
-  l.blen = fd(f.blen);
   l.npng_d = fd(f.npng);
   l.nens_d = length(vd(v.tim));
   l.nbin = fd(f.nbin);
@@ -1566,7 +1568,7 @@ end
 
 a=setdefv(a,'use_tilt',1);
 a=setdefv(a,'use_heading',1);
-a=setdefv(a,'use_binremap',1);
+a=setdefv(a,'use_binremap',0);			%%% CODE IS BUGGY! DO NOT USE
 a=setdefv(a,'beams_up',a.Up);
 a=setdefv(a,'beamangle',a.Beam_angle);
 
@@ -1616,6 +1618,14 @@ beam=squeeze(velb(ii,:,:));
 RR=roll.*d2r;
 KA=sqrt(1.0 - (sin(pitch.*d2r).*sin(roll.*d2r)).^2);
 PP=asin(sin(pitch.*d2r).*cos(roll.*d2r)./KA);
+%% NB: The preceding two lines could be replaced with
+%% 		PP=atan(tan(pitch.*d2r) * cos(roll.*d2r));
+%%     which is the expression given by RDI in the coord-
+%%     trans manual. I have tried this with a single
+%%     file from DIMES UK2 and the max velocity differences
+%%     are 1e-13 m/s, i.e. they look consistent with
+%%     roundoff errors.
+
 HH=head.*d2r;
 
 % Step 2 - calculate trig functions and scaling factors
@@ -1662,7 +1672,8 @@ for IB=1:NBINS,
  % Step 3:  correct depth cell index for pitch and roll
  for i=1:4, 
   if a.use_binremap
-   J(i)=fix(IB.*SC(i)+0.5); 
+%   J(i)=fix(IB.*SC(i)+0.5);
+   J(i)=IB; %%%
   else
    J(i)=IB;
   end
