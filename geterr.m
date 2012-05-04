@@ -1,9 +1,9 @@
 %======================================================================
 %                    G E T E R R . M 
 %                    doc: Wed Jun 30 23:24:51 2004
-%                    dlm: Fri Mar  5 15:48:05 2010
+%                    dlm: Wed Jul  6 20:26:14 2011
 %                    (c) 2004 ladcp@
-%                    uE-Info: 91 17 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 19 35 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
@@ -13,14 +13,22 @@
 %  Jul 16, 2004: - added global variable skip_figure_3 to workaround
 %		   linux matlab bug
 %  Oct  7, 2008: - extensively modified procfig 3 for version IX_6
+%  Jun 29, 2011: - removed skp_figure_3
+%		 - added ps.fig3_colormap, ps.fig3_err_y_axis, ps.fig3_avgerr
+%  Jun 30, 2011: - fixed fig.3 middle column plot title for median plot
+%  Jul  6, 2001: - fixed plot title
 
-function l=geterr(dr,d,iplot)
+function l=geterr(ps,dr,d,iplot)
 % function l=geterr(dr,d,iplot)
 % returns predicitons of U_ocean and
 % U_ctd on the raw data grid
 % 
 % CTD velocity
-if nargin<3, iplot=1; end
+if nargin<4, iplot=1; end
+
+ps=setdefv(ps,'fig3_colormap',2);	% 1: jet	2: polar
+ps=setdefv(ps,'fig3_err_y_axis',2);	% 1: bin#	2: depth
+ps=setdefv(ps,'fig3_avgerr',2');	% 1: mean	2: median 
 
 tim=dr.tim;
 tim(1)=-1e30;
@@ -102,7 +110,9 @@ if abs(dzup-dzdo)>dzup*0.1
   iiz=ceil(iz(ii(j)));
   iit=itm(ii(j));
   l.u_oce(iiz,iit)=d.ru(ii(j))-l.ru_ctd(ii(j));
+  l.u_err(iiz,iit)=d.ru(ii(j))-l.ru_oce(ii(j))-l.ru_ctd(ii(j));
   l.v_oce(iiz,iit)=d.rv(ii(j))-l.rv_ctd(ii(j));
+  l.v_err(iiz,iit)=d.rv(ii(j))-l.rv_oce(ii(j))-l.rv_ctd(ii(j));
   l.w_oce(iiz,iit)=d.rw(ii(j))-l.rw_ctd(ii(j));
   l.w_oce_z(iiz,iit)=d.rw(ii(j))-l.rw_ctd_z(ii(j));
   if existf(l,'rw_ctd_p')
@@ -120,7 +130,9 @@ if abs(dzup-dzdo)>dzup*0.1
  end
 else % uplooker and downlooker bin sizes are equal
  l.u_oce=full(sparse(ceil(iz(ii)),itm(ii),d.ru(ii)-l.ru_ctd(ii)));
+ l.u_err=full(sparse(ceil(iz(ii)),itm(ii),d.ru(ii)-l.ru_oce(ii)-l.ru_ctd(ii)));
  l.v_oce=full(sparse(ceil(iz(ii)),itm(ii),d.rv(ii)-l.rv_ctd(ii)));
+ l.v_err=full(sparse(ceil(iz(ii)),itm(ii),d.rv(ii)-l.rv_oce(ii)-l.rv_ctd(ii)));
  l.w_oce=full(sparse(ceil(iz(ii)),itm(ii),d.rw(ii)-l.rw_ctd(ii)));
  l.w_oce_z=full(sparse(ceil(iz(ii)),itm(ii),d.rw(ii)-l.rw_ctd_z(ii)));
  if existf(l,'rw_ctd_p')
@@ -177,41 +189,69 @@ ii=find(iz<0 | iz>max(dr.z)/dz);
 d.ru(ii)=nan;
 d.rv(ii)=nan;
 
-global skip_figure_3;
-if isempty(skip_figure_3)
-
    figure(3)
    clf
    orient landscape
    
-   colormap(polarmap(21));
-   
-   subplot(231)
+
+   if ps.fig3_colormap == 2
+     colormap(polarmap(21));
+   else
+     col=jet(128);
+     col=([[1 1 1]; col]);
+     colormap(col)
+   end
+
    ib=1:size(l.ru_err,1);
    ib=ib-length(d.izu);
-   tmp = l.ru_err; tmp(isnan(tmp)) = 0;
-   pcolorn(l.itv2,-ib,tmp), shading flat
+
+   subplot(231)
+   if ps.fig3_err_y_axis == 2
+     if ps.fig3_colormap == 2
+       tmp = l.u_err; tmp(isnan(tmp)) = 0;
+       pcolorn(l.itv,-l.z_oce,tmp), shading flat
+     else
+       pcolorn(l.itv,-l.z_oce,l.u_err), shading flat
+     end
+     ylabel('Depth [m]');
+   else
+     if ps.fig3_colormap == 2
+       tmp = l.ru_err; tmp(isnan(tmp)) = 0;
+       pcolorn(l.itv2,-ib,tmp), shading flat
+     else
+       pcolorn(l.itv2,-ib,l.ru_err), shading flat
+     end
+     ylabel('Bin #');
+   end
    fac=meannan(l.u_oce_s);
    fac=max([fac,1e-2]);
    caxis([-3 3]*fac)
    colorbar
    xlabel('Super Ensemble #');
-   ylabel('Bin #');
    title(sprintf('U-err std: %.03f',meannan(stdnan(l.ru_err'))))
    
    subplot(232)
-   plot(meannan(l.ru_err')',-ib)
+   if ps.fig3_avgerr == 2
+     plot(medianan(l.ru_err')',-ib)
+     title('median(U-err)')
+   else
+     plot(meannan(l.ru_err')',-ib)
+     title('mean(U-err)')
+   end
    set(gca,'XLim',[-0.05 0.05]);
    set(gca,'Ylim',[-ib(end) -ib(1)]);
    set(gca,'Xtick',[-0.04:0.02:0.04]);
    grid
    xlabel('Residual [m/s]');
    ylabel('Bin #');
-   title('mean(U-err)')
    
    subplot(233)
-   tmp = l.u_oce; tmp(isnan(tmp)) = 0;
-   pcolorn(l.itv,-l.z_oce,tmp), shading flat
+   if ps.fig3_colormap == 2
+     tmp = l.u_oce; tmp(isnan(tmp)) = 0;
+     pcolorn(l.itv,-l.z_oce,tmp), shading flat
+   else
+     pcolorn(l.itv,-l.z_oce,l.u_oce), shading flat
+   end
    ca = caxis;
    if abs(ca(1)) > abs(ca(2))
     caxis([-abs(ca(1)) abs(ca(1))]);
@@ -231,8 +271,23 @@ if isempty(skip_figure_3)
    title('U_{oce}')
    
    subplot(234)
-   tmp = l.rv_err; tmp(isnan(tmp)) = 0;
-   pcolorn(l.itv2,-ib,tmp), shading flat
+   if ps.fig3_err_y_axis == 2
+     if ps.fig3_colormap == 2
+       tmp = l.v_err; tmp(isnan(tmp)) = 0;
+       pcolorn(l.itv,-l.z_oce,tmp), shading flat
+     else
+       pcolorn(l.itv,-l.z_oce,l.v_err), shading flat
+     end
+     ylabel('Depth [m]');
+   else
+     if ps.fig3_colormap == 2
+       tmp = l.rv_err; tmp(isnan(tmp)) = 0;
+       pcolorn(l.itv2,-ib,tmp), shading flat
+     else
+       pcolorn(l.itv2,-ib,l.rv_err), shading flat
+     end
+     ylabel('Bin #');
+   end
    fac=meannan(l.v_oce_s);
    fac=max([fac,1e-2]);
    caxis([-3 3]*fac)
@@ -242,18 +297,27 @@ if isempty(skip_figure_3)
    title(sprintf('V-err std: %.03f',meannan(stdnan(l.rv_err'))))
    
    subplot(235)
-   plot(meannan(l.rv_err')',-ib)
+   if ps.fig3_avgerr == 2
+     plot(medianan(l.rv_err')',-ib)
+     title('median(V-err)')
+   else
+     plot(meannan(l.rv_err')',-ib)
+     title('mean(V-err)')
+   end
    set(gca,'XLim',[-0.05 0.05]);
    set(gca,'Ylim',[-ib(end) -ib(1)]);
    set(gca,'Xtick',[-0.04:0.02:0.04]);
    grid
    xlabel('Residual [m/s]');
    ylabel('Bin #');
-   title('mean(V-err)')
 
    subplot(236)
-   tmp = l.v_oce; tmp(isnan(tmp)) = 0;
-   pcolorn(l.itv,-l.z_oce,tmp), shading flat
+   if ps.fig3_colormap == 2
+     tmp = l.v_oce; tmp(isnan(tmp)) = 0;
+     pcolorn(l.itv,-l.z_oce,tmp), shading flat
+   else
+     pcolorn(l.itv,-l.z_oce,l.v_oce), shading flat
+   end
    ca = caxis;
    if abs(ca(1)) > abs(ca(2))
     caxis([-abs(ca(1)) abs(ca(1))]);
@@ -270,10 +334,9 @@ if isempty(skip_figure_3)
    colorbar
    xlabel('Ensemble #');
    ylabel('Depth [m]');
-   title('U_{oce}')
+   title('V_{oce}')
    
    streamer([dr.name,'  Figure 3']);
-end % of ~skip_figure_3
 
 % reset colormap
 figure(11)

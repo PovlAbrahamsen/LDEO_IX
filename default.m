@@ -1,15 +1,17 @@
 %======================================================================
 %                    D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Wed Apr 27 11:05:37 2011
+%                    dlm: Fri May  4 08:45:46 2012
 %                    (c) 2004 ladcp@
-%                    uE-Info: 28 45 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 30 45 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
 %	Jan  7, 2009: - tightened use of exist()
 %	Jul 22, 2009: - typo in ps.smallfac
 %				  - changed default of ps.smallfac
+%	Apr 26, 2012: - removed diffusivity calculation
+%	May  4, 2012: - updated version to IX_8
 
 % LADCP processing software
 % M. Visbeck. LDEO/2003
@@ -25,7 +27,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_7';
+p.software='LDEO LADCP software: Version IX_8';
 
 % file names
 % f.ladcpdo  is the ONLY required input
@@ -442,9 +444,6 @@ ps=setdefv(ps,'up_dn_looker',1);
 % Set fixed range for velocity plots
 % ps=setdefv(ps,'urange',ur);
 % ps=setdefv(ps,'zrange',ax(3:4));
-
-% Set parameter for vertical diffusivity calculation
-%%% pk.top='calculate vertical diffusion';
 
 % ------------------------------------------------------------------
 % OUTPUT data files

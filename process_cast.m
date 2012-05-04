@@ -41,9 +41,9 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %======================================================================
 %                    P R O C E S S _ C A S T . M 
 %                    doc: Thu Jun 24 16:54:23 2004
-%                    dlm: Wed Jan  7 16:48:20 2009
+%                    dlm: Thu Apr 26 11:02:01 2012
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 609 0 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 82 56 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % NOTES:
@@ -79,6 +79,7 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %		   with CLIVAR P18 leg1 casts 46, 48, 49 & 50
 %  Sep 18, 2008: - BUG: p.navdata was non-existent field when no nav
 %			data were loaded
+%  Apr 26, 2012: - finally removed finestructure kz code
 
 %----------------------------------------------------------------------
 % STEP 0: EXECUTE ALWAYS
@@ -476,24 +477,6 @@ if pcs.begin_step <= pcs.cur_step
    dr.ctd_ss=interp1q(d.ctdprof_z,d.ctdprof_ss,dr.z);
   end
   
-  %
-  % estimate vertical diffusivity if CTD N2 profile exist
-  %  this is totally experimental and might be WRONG!
-  %
-  if existf(d,'ctdprof_N2') & exist('pk','var')
-   pcs.update_figures = [pcs.update_figures 8];   
-   disp(' compute vertical diffusivity')
-   dr.ctd_N2=interp1q(d.ctdprof_z,d.ctdprof_N2,dr.z);
-   [dk,pk]=getkzprof(dr,pk,dr.ctd_N2);
-   if existf(dk,'z')
-    if length(dk.z)>1
-     zz=[dk.z(1)-dk.zrange/4,dk.z,dk.z(end)+dk.zrange/4]';
-     Kz=dk.Kz([1 1:end end])';
-     dr.Kz=interp1q(zz,Kz,dr.z);
-    end
-   end
-  end
-
   end_processing_step;
 end % OF STEP 16: CALCULATE DIFFUSIVITY PROFILE
 

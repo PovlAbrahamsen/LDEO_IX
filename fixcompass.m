@@ -1,3 +1,11 @@
+%======================================================================
+%                    F I X C O M P A S S . M 
+%                    doc: Fri Dec 30 14:59:27 2011
+%                    dlm: Sat Dec 31 12:32:47 2011
+%                    (c) 2011 A.M. Thurnherr
+%                    uE-Info: 31 92 NIL 0 0 72 0 2 4 NIL ofnI
+%======================================================================
+
 function [d,p]=fixcompass(d,p)
 % 
 % fix compass issues
@@ -16,6 +24,11 @@ function [d,p]=fixcompass(d,p)
 %
 % M. Visbeck LDEO 2004
 %
+
+% Changes by ant:
+%	Dec 30, 2011: - BUG: p.fix_compass = 2 and = 3 did not work; bug report and fix 
+%						 provided by Roman Tarakanov <rtarakanov@gmail.com> today
+%						 bug fix verified with PALE data (old code produces garbage results)
 
 disp('FIXCOMPASS adjust compass')
 
@@ -43,7 +56,7 @@ p.hdg_offset_used(1)=p.hdg_offset_used(1)+rot(1);
 
 if p.fix_compass==3
   disp(' use up looking compass on down looking ADCP')
-  rotv(1,:)=d.hdg(1,:)-d.hdg(2,:)+rot(1);
+  rotv(1,:)=d.hdg(2,:)-d.hdg(1,:)+rot(1);
   p.rotup2down=0;
 end
 
@@ -53,7 +66,7 @@ if length(d.izu)>0
   p.hdg_offset_used(2)=p.hdg_offset_used(2)+rot(2);
   if p.fix_compass==2
    disp(' use down looking compass on up looking ADCP')
-   rotv(2,:)=d.hdg(2,:)-d.hdg(1,:)+rot(2);
+   rotv(2,:)=d.hdg(1,:)-d.hdg(2,:)+rot(2);
    p.rotup2down=0;
   end
 end

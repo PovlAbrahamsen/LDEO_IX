@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Wed Apr 27 11:06:33 2011
+                    dlm: Fri May  4 09:24:01 2012
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 164 68 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 192 51 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -164,4 +164,30 @@ IX_7:
 		- added TODO file with known bugs and potential improvements
 	Apr 27, 2011:
 		- updated version in [default.m] to IX_7
-		- publised on Mercurial server
+		- published on Mercurial server
+
+IX_8beta:
+	Jul 2011:
+		- added new plot options to [geterr.m]
+		- adapted [getinv.m] to new [geterr.m]
+		- disabled bin-remapping in [loadrdi.m]
+	Dec 30, 2011:
+		- implemented user-provided bug fix in [fixcompass.m]
+
+IX_8gamma:
+	Jan  6, 2012:
+		- removed lesqchol() from getinv.m because it does not
+		  deal well with (near-)singular matrices; while this is
+		  somewhat iffy in the sense that the new code can produce trash
+		  where the old code produced some mix of nans and zeros;
+		  however, if the data are really trash they will cause very
+		  large velocities that are removed from the solutions, i.e. it
+		  is hoped that this change does not confuse things
+		- added imagnan.m
+	Apr 26, 2012:
+		- finally removed code that calculates diffusivity profiles
+
+IX_8:
+	May  4, 2012:
+		- updated version in [default.m] [.hg/hgrc]
+		- published on Mercurial server
