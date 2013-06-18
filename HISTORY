@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Tue May 22 11:02:49 2012
+                    dlm: Tue Jun 18 11:41:17 2013
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 198 74 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 208 0 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -196,4 +196,14 @@ IX_9:
 	May 22, 2012:
 		- updated version to IX_9beta in [default.m] [.hg/hgrc]
 		- disabled code to use GPS info from SADCP stream in [loadsadcp.m]
-
+    Jun  3, 2013:
+		- BUG: [plotraw.m] top panel of Fig. 2 was wrong for dual-headed
+        				   LADCPs with different UL/DL bin sizes
+	Jun 18, 2013:
+    	- BUG: IX_8 distribution does not include geomag (original .hg subdir
+		       had to be disabled)
+    	- fixed minor permission bugs
+		- updated version to IX_9 in [default.m] [.hg/hgrc]
+    	- hg tag IX_9
+		- published on Mercurial server
+														 

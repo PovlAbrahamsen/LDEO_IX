@@ -1,0 +1,15 @@
+(^|/)CVS($|/)
+(^|/)\.hg($|/)
+(^|/)\.DS_Store$
+\.pyc$
+\.o$
+\.so$
+\.raw$
+\.log$
+\.old$
+\.orig$
+\.bak$
+~$
+#
+build/
+

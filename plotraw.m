@@ -6,13 +6,15 @@ function p=plotraw(d,p)
 %======================================================================
 %                    P L O T R A W . M 
 %                    doc: Fri Jan  5 15:38:43 2007
-%                    dlm: Fri Jan  5 15:46:39 2007
+%                    dlm: Mon Jun  3 14:09:21 2013
 %                    (c) 2007 M. Visbeck with contribs from A. Thurnherr
-%                    uE-Info: 15 37 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 79 0 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
 %	Jan  5, 2007: - fixed checkbeam() as suggested by B. Huber
+%	Jun  3, 2013: - BUG: top panel of Fig. 2 was wrong for dual-headed
+%						 LADCPs with different UL/DL bin sizes
 
 pmax=200;
 orient tall
@@ -56,15 +58,28 @@ if length(iz)>1
  n3bd=length(i3bd)/length(ii)*100;
 end
 
-% contour results
+% plot vertical velocities
 col=jet(128);
 col=([[1 1 1]; col]);
 colormap(col)
-pcolorn(ii,zz,rw), shading flat
+
+pcolorn(ii,zz,rw) % this is neccessary even for dual-headed data sets
+
+if (length(d.izu) > 0)
+	pcolorn(ii,zz(1:length(d.izu)),rw(1:length(d.izu),:))
+	hold on, shading flat
+	ax = axis;
+	ax(1) = ii(1);
+	ax(2) = ii(end);
+	ax(4) = -zz(end);
+	axis(ax);
+	pcolorn(ii,zz(length(d.izu)+1:end),rw(length(d.izu)+1:end,:))
+end
+
 hold on
-ax=axis;
-plot(ax(1:2),[0 0],'-k')
-axis(ax), colorbar('horiz')
+plot([ii(1),ii(end)],[0 0],'-k')
+colorbar('horiz')
+
 % mark 3-beam solutions
 if n3bu>10
  l3b=NaN*ii;
