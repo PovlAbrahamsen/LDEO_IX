@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Fri May  4 09:24:01 2012
+                    dlm: Tue May 22 11:02:49 2012
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 192 51 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 198 74 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -191,3 +191,9 @@ IX_8:
 	May  4, 2012:
 		- updated version in [default.m] [.hg/hgrc]
 		- published on Mercurial server
+
+IX_9:
+	May 22, 2012:
+		- updated version to IX_9beta in [default.m] [.hg/hgrc]
+		- disabled code to use GPS info from SADCP stream in [loadsadcp.m]
+

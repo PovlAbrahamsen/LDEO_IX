@@ -1,9 +1,9 @@
 %======================================================================
 %                    D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Fri May  4 08:45:46 2012
+%                    dlm: Tue May 22 11:02:16 2012
 %                    (c) 2004 ladcp@
-%                    uE-Info: 30 45 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 30 49 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -27,7 +27,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_8';
+p.software='LDEO LADCP software: Version IX_9beta';
 
 % file names
 % f.ladcpdo  is the ONLY required input
