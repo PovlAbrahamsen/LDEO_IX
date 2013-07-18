@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Tue Jun 18 11:41:17 2013
+                    dlm: Mon Jun 24 10:06:23 2013
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 208 0 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 213 78 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -207,3 +207,8 @@ IX_9:
     	- hg tag IX_9
 		- published on Mercurial server
 														 
+IX_10:
+	Jun 24, 2013:
+		- updated version to IX_10beta in [default.m] [.hg/hgrc]
+		- re-added blen in [loadrdi.m] (also separate other DL/UL header vars)
+		

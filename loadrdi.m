@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Thu Aug 18 17:20:09 2011
+%                    dlm: Mon Jun 24 10:17:29 2013
 %                    (c) 2004 ladcp@
-%                    uE-Info: 46 76 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 48 72 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -44,6 +44,8 @@ function [d,p,de]=loadrdi(f,p)
 %		 - apparently unused z-variable commented out
 %  Jun 30, 2011: - buggy bin-remapping disabled
 %  Aug 18, 2011: - added comment to coord-transformation code (gimbal pitch)
+%  Jun 24, 2013: - blen re-added but separately for DL/UL
+%		 - added separate nbin, blnk, dist for DL/UL to p struct
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -131,27 +133,39 @@ end
 % remember which bin come from which instrument (up-down) configuration
 % get instrument configuration
 %
-d.izd=1:length(l.zd);
-d.zd=l.zd;
-p.serial_cpu_d=l.serial_cpu_d;
-p.nping_total=l.npng_d*l.nens_d;
-d.bbadcp=l.bbadcp;
-p.instid(1)=prod(p.serial_cpu_d+1)+sum(p.serial_cpu_d);
-%if d.bbadcp
- [dummy,d.down]=rditype(f.ladcpdo);
- if d.down.Up
+d.izd		= 1:length(l.zd);
+d.zd		= l.zd;
+d.bbadcp	= l.bbadcp;
+
+p.serial_cpu_d	= l.serial_cpu_d;
+p.nping_total	= l.npng_d*l.nens_d;
+p.instid(1)	= prod(p.serial_cpu_d+1)+sum(p.serial_cpu_d);
+p.blen_d 	= l.blen_d;
+p.nbin_d 	= l.nbin_d;
+p.blnk_d 	= l.blnk_d;
+p.dist_d 	= l.dist_d;
+
+[dummy,d.down]=rditype(f.ladcpdo);
+if d.down.Up
   warn=(' up looking instrument detected in do-file');
   p.warnp(size(p.warnp,1)+1,1:length(warn))=warn;
   disp(warn)
   d.zd=-d.zd;
- end
- if existf(l,'zu')
-   d.zu=l.zu;
-   p.serial_cpu_u=l.serial_cpu_u;
-   p.instid(2)=prod(p.serial_cpu_u+1)+sum(p.serial_cpu_u);
-   p.nping_total(2)=l.npng_u*l.nens_u;
-   d.izu=fliplr(1:length(l.zu));
-   d.izd=d.izd+length(d.izu);
+end
+ 
+if existf(l,'zu')
+   d.izu		= fliplr(1:length(l.zu));
+   d.izd		= d.izd+length(d.izu);
+   d.zu			= l.zu;
+
+   p.serial_cpu_u	= l.serial_cpu_u;
+   p.instid(2)		= prod(p.serial_cpu_u+1)+sum(p.serial_cpu_u);
+   p.nping_total(2)	= l.npng_u*l.nens_u;
+   p.blen_u		= l.blen_u;
+   p.nbin_u		= l.nbin_u;
+   p.blnk_u		= l.blnk_u;
+   p.dist_u     	= l.dist_u;
+   
    [dummy,d.up]=rditype(f.ladcpup);
    if d.up.Up==0
     warn=(' down looking instrument detected in up-file');
@@ -159,11 +173,10 @@ p.instid(1)=prod(p.serial_cpu_d+1)+sum(p.serial_cpu_d);
     disp(warn)
     d.zu=-d.zu;
    end
- else
+else
    d.izu=[];
    d.zu=[];
- end
-%end
+end
 
 %
 % apply w velocity threshold
@@ -949,9 +962,14 @@ if up
   l.npng_d = fd(f.npng);
   l.nens_u = size(vu,1);
   l.nens_d = size(vd,1);
-  l.nbin = fd(f.nbin);
-  l.blnk = fd(f.blnk);
-  l.dist = fd(f.dist);
+  l.blen_u = fu(f.blen);
+  l.blen_d = fd(f.blen);
+  l.nbin_u = fu(f.nbin);
+  l.nbin_d = fd(f.nbin);
+  l.blnk_u = fu(f.blnk);
+  l.blnk_d = fd(f.blnk);
+  l.dist_u = fu(f.dist);
+  l.dist_d = fd(f.dist);
   l.tim = [vd(id,1,v.tim),vu(iu,1,v.tim)]';
   l.pit = [vd(id,1,v.pit),vu(iu,1,v.pit)]';
   l.rol = [vd(id,1,v.rol),vu(iu,1,v.rol)]';
@@ -1020,9 +1038,10 @@ else % single instrument
   eval(['l.serial_cpu_d=fd(',f.serial,');']);
   l.npng_d = fd(f.npng);
   l.nens_d = length(vd(v.tim));
-  l.nbin = fd(f.nbin);
-  l.blnk = fd(f.blnk);
-  l.dist = fd(f.dist);
+  l.blen_d = fd(f.blen);
+  l.nbin_d = fd(f.nbin);
+  l.blnk_d = fd(f.blnk);
+  l.dist_d = fd(f.dist);
   l.tim = vd(:,1,v.tim)';
   l.pit = vd(:,1,v.pit)';
   l.rol = vd(:,1,v.rol)';

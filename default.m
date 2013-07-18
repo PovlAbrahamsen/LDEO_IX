@@ -1,9 +1,9 @@
 %======================================================================
 %                    D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Tue Jun 18 11:50:33 2013
+%                    dlm: Mon Jun 24 10:05:41 2013
 %                    (c) 2004 ladcp@
-%                    uE-Info: 15 43 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 32 50 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -13,6 +13,7 @@
 %	Apr 26, 2012: - removed diffusivity calculation
 %	May  4, 2012: - updated version to IX_8
 %	Jun 18, 2013: - updated version to IX_9
+%	Jun 24, 2013: - updated version to IX_10beta
 
 % LADCP processing software
 % M. Visbeck. LDEO/2003
@@ -28,7 +29,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_9';
+p.software='LDEO LADCP software: Version IX_10beta';
 
 % file names
 % f.ladcpdo  is the ONLY required input
