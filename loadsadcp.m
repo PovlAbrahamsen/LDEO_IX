@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D S A D C P . M 
 %                    doc: Sun Jun 27 23:42:04 2004
-%                    dlm: Fri Mar  5 15:49:11 2010
+%                    dlm: Tue May 22 11:01:21 2012
 %                    (c) 2004 ladcp@
-%                    uE-Info: 133 14 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 109 4 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -11,6 +11,10 @@
 %  Jul  9, 2004: - made lack of SADCP data in time window into real warning
 %  Jan  7, 2009: - tightened use of exist()
 %  Mar  4, 2010: - changed default of p.sadcp_dtok from 5min to zero
+%  May 22, 2012: - removed code that took GPS information from SADCP data, 
+%		   because these data are unlikely to be accurate enough
+%		   for the ship-drift constraint; if they are, the user
+%		   should verify and make a GPS file during pre-processing
 
 function   [di,p]=loadsadcp(f,di,p)
 % function   [di,p]=loadsadcp(f,di,p)
@@ -78,14 +82,15 @@ if existf(f,'sadcp')==1
    streamer([p.name,' Figure 9']);
    pause(0.001)
    return; 
-  end
+  end % if no SADCP data in LADCP region
   
-% interpolate SADCP navigation to LADCP time series
+  % interpolate SADCP navigation to LADCP time series
   di.sadcp_lon=interp1(tim_sadcp,lon_sadcp(:),di.time_jul);
   di.sadcp_lat=interp1(tim_sadcp,lat_sadcp(:),di.time_jul);
 
   % set position from SADCP nav
   if abs(p.lon)+abs(p.lat)==0
+   error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
    slat=di.sadcp_lat(1);
    slon=di.sadcp_lon(1);
    elat=di.sadcp_lat(end);
@@ -96,10 +101,12 @@ if existf(f,'sadcp')==1
  
 % if no other ship navigation exists, use SADCP navigation
   if existf(di,'slon')==0
+   error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
    di.slon=di.sadcp_lon;
    di.slat=di.sadcp_lat;
   else
    if sum(isfinite(di.slon+di.slat))==0
+    error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
     di.slon=di.sadcp_lon;
     di.slat=di.sadcp_lat;
    end

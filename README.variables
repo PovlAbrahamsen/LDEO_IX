@@ -1,9 +1,9 @@
 ======================================================================
                     R E A D M E . V A R I A B L E S 
                     doc: Tue Apr 13 10:51:01 2010
-                    dlm: Thu Apr 15 10:17:11 2010
+                    dlm: Mon Jun  3 12:35:43 2013
                     (c) 2010 A.M. Thurnherr
-                    uE-Info: 22 25 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 30 22 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 ----------------------------------------------------------------------
@@ -25,6 +25,12 @@ d.izd(bin), d.izu(bin)
 	- set in [loadrdi.m]
 	- d.izd(1) is first bin of downlooker
 	- d.izu(end) is last bin of uplooker
+
+d.z(ensemble)
+	- instrument depth
+
+d.izm(combo_bin,ensemble)
+	- depth of each measurement
 
 ----------------------------------------------------------------------
 OUTPUT FIELDS

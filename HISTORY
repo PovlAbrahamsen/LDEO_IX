@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Fri Jan  6 11:59:11 2012
+                    dlm: Thu Jul 18 04:09:59 2013
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 185 59 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 214 0 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -164,7 +164,7 @@ IX_7:
 		- added TODO file with known bugs and potential improvements
 	Apr 27, 2011:
 		- updated version in [default.m] to IX_7
-		- publised on Mercurial server
+		- published on Mercurial server
 
 IX_8beta:
 	Jul 2011:
@@ -184,3 +184,31 @@ IX_8gamma:
 		  large velocities that are removed from the solutions, i.e. it
 		  is hoped that this change does not confuse things
 		- added imagnan.m
+	Apr 26, 2012:
+		- finally removed code that calculates diffusivity profiles
+
+IX_8:
+	May  4, 2012:
+		- updated version in [default.m] [.hg/hgrc]
+		- published on Mercurial server
+
+IX_9:
+	May 22, 2012:
+		- updated version to IX_9beta in [default.m] [.hg/hgrc]
+		- disabled code to use GPS info from SADCP stream in [loadsadcp.m]
+    Jun  3, 2013:
+		- BUG: [plotraw.m] top panel of Fig. 2 was wrong for dual-headed
+        				   LADCPs with different UL/DL bin sizes
+	Jun 18, 2013:
+    	- BUG: IX_8 distribution does not include geomag (original .hg subdir
+		       had to be disabled)
+    	- fixed minor permission bugs
+		- updated version to IX_9 in [default.m] [.hg/hgrc]
+    	- hg tag IX_9
+		- published on Mercurial server
+														 
+IX_10:
+	Jun 24, 2013:
+		- updated version to IX_10beta in [default.m] [.hg/hgrc]
+		- re-added blen in [loadrdi.m] (also separate other DL/UL header vars)
+
