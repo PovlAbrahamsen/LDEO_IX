@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Thu Jul 18 04:09:59 2013
+                    dlm: Wed Aug 28 12:34:06 2013
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 214 0 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 227 72 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -210,5 +210,18 @@ IX_9:
 IX_10:
 	Jun 24, 2013:
 		- updated version to IX_10beta in [default.m] [.hg/hgrc]
-		- re-added blen in [loadrdi.m] (also separate other DL/UL header vars)
-
+		- re-added blen in [loadrdi.m] (also separate other DL/UL header
+		  vars) in order to spit it out as metadata
+	Aug 13, 2013:
+		- fixed bug in [edit_data.m] that prevented sidelobes from being
+		  edited out for UL-only data
+	Aug 15, 2013:
+		- incorporated new [ladcp2cdf.m] contributed by Diana Cardoso, with
+		  modifications
+		- removed [readme.m] which is badly out-of-date
+	Aug 16, 2013:
+		- changed semantics in [loadctd.m] to generate and error
+		  (rather than a warning and an attempted work-around, which does
+		  not work for combined GPS/CTD data) when time lagging fails
+	Aug 28, 2013:
+		- implemented bug fix to [ladcp2cdf.m] provided by Diana Cardoso

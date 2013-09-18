@@ -1,13 +1,14 @@
 %======================================================================
 %                    S A V E A R C H . M 
 %                    doc: Wed Jan  7 16:51:58 2009
-%                    dlm: Fri Mar  5 15:49:49 2010
+%                    dlm: Thu Aug 15 12:17:03 2013
 %                    (c) 2009 A.M. Thurnherr
-%                    uE-Info: 180 13 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 217 16 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
 %   Jan  7, 2009: - tightened use of exist()
+%   Aug 15, 2013: - adapted to new [ladcp2cdf.m]
 
 function [da]=savearch(dr,d,p,ps,f,att)
 % function [da]=savearch(dr,d,p,ps,f,att)
@@ -208,12 +209,14 @@ if p.savemat
  eval(['save ',[f.res,'.ladcp.mat'],' da dr att'])
 end
 
-% save to netcdf file if you have NETCDF libary
-if exist('netcdf','file') & p.savecdf
- dr.tim=dr.tim-year0;
- disp([' save levelII results in LADCP cdffile: ',f.res,'.nc'])
- ladcp2cdf([f.res,'.nc'],dr,da,p,ps,f,att)
-else
- disp('install NETCDF libary to get the netcdf LADC archive output')
-end 
+% save to netcdf file if you have a modern-enough version of matlab
 
+if p.savecdf
+  if exist('ncwrite') == 2
+   dr.tim=dr.tim-year0;
+   disp([' save results in netcdf file: ',f.res,'.nc'])
+   ladcp2cdf([f.res,'.nc'],dr,da,p,ps,f,att)
+  else
+   disp('upgrade your matlab version to get the netcdf LADCP archive output')
+  end 
+end

@@ -14,13 +14,14 @@ function d = edit_data(d,p)
 %		   provided by Mattew Alford
 %		 - disabled edit_spike_filter by default
 %		 - changed edit_spike_filter_max_curv default value
+%  Aug 13, 2013: - BUG: edit_sidelobes did not work for UL only data
 
 %======================================================================
 %                    E D I T _ D A T A . M 
 %                    doc: Sat Jul  3 17:13:05 2004
-%                    dlm: Thu May 18 12:20:40 2006
+%                    dlm: Tue Aug 13 15:34:27 2013
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 50 37 NIL 0 0 72 3 2 8 NIL ofnI
+%                    uE-Info: 122 0 NIL 0 0 72 3 2 8 NIL ofnI
 %======================================================================
 
 %----------------------------------------------------------------------
@@ -116,9 +117,19 @@ if p.edit_sidelobes
   
   % first, the uplooker: d.z is -ve distance of ADCP from surface;
   % Cell_length is in cm, i.e. 0.015*Cell_length is 1.5 x bin size
-  % in m --- the same value used by Firing's software
+  % in m --- the same value used by Eric Firing's software
   
-  if length(d.zu > 0)
+  if length(d.zu)==0 && d.zd(1)<0			% UL only (in DL structures)
+
+    for b=1:length(d.zd)
+      zlim(b,:) = (1 - cos(pi*d.down.Beam_angle/180)) * d.z ...
+		- 0.015*d.down.Cell_length;
+    end
+    ibad = find(d.izm > zlim);
+    nbad = nbad + length(find(isfinite(d.weight(ibad))));
+    d.weight(ibad) = NaN; d.ts_edited(ibad) = NaN;
+  
+  elseif length(d.zu > 0)				% DL/UL combo
   
     for b=1:length(d.zu)+length(d.zd)
       zlim(b,:) = (1 - cos(pi*d.up.Beam_angle/180)) * d.z ...

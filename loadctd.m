@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D C T D . M 
 %                    doc: Sat Jun 26 15:56:43 2004
-%                    dlm: Fri Mar  5 15:51:21 2010
+%                    dlm: Fri Aug 16 10:53:40 2013
 %                    (c) 2004 M. Visbeck & A. Thurnherr
-%                    uE-Info: 401 16 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 445 41 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 function [d,p]=loadctd(f,d,p)
@@ -438,6 +438,12 @@ if p.ctdmaxlag>0
    p.warn(size(p.warn,1)+1,1:length(warn))=warn;
   end
  else
+  error('Cannot determine time offset between CTD and LADCP time series --- aborting');
+
+  % The following old code has been disabled for IX_10 because it is known not to work correctly
+  % for combined NAV/CTD data, because the NAV time series *must* be matched to the LADCP data
+  % for the GPS constraint to be applied.
+
   text(1,0,'LOW CORRELATION not used','color','r')
   disp('WARNING WARNING WARNING')
   warn=(' lag too big or correlation too weak: ignore CTD time series');
