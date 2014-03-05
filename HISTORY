@@ -1,9 +1,9 @@
 ======================================================================
-                    H I S T O R Y 
+                    C U R R E N T / H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Wed Aug 28 12:34:06 2013
+                    dlm: Wed Mar  5 13:46:26 2014
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 227 72 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 230 36 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -225,3 +225,7 @@ IX_10:
 		  not work for combined GPS/CTD data) when time lagging fails
 	Aug 28, 2013:
 		- implemented bug fix to [ladcp2cdf.m] provided by Diana Cardoso
+	Mar  5, 2014:
+		- version updated to IX_10
+		- added Processing_HowTo.pdf
+		- uploaded for DIMES UK5

@@ -1,9 +1,9 @@
 %======================================================================
-%                    D E F A U L T . M 
+%                    C U R R E N T / D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Thu Jul 18 04:10:38 2013
+%                    dlm: Wed Mar  5 13:23:17 2014
 %                    (c) 2004 ladcp@
-%                    uE-Info: 33 0 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 33 46 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -14,6 +14,7 @@
 %	May  4, 2012: - updated version to IX_8
 %	Jun 18, 2013: - updated version to IX_9
 %	Jun 24, 2013: - updated version to IX_10beta
+%	Mar  5, 2014: - updated version to IX_10
 
 % LADCP processing software
 % M. Visbeck. LDEO/2003
@@ -29,7 +30,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_10beta';
+p.software='LDEO LADCP software: Version IX_10';
 
 % file names
 % f.ladcpdo  is the ONLY required input
