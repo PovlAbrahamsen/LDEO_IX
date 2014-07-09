@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D C T D . M 
 %                    doc: Sat Jun 26 15:56:43 2004
-%                    dlm: Fri Aug 16 10:53:40 2013
+%                    dlm: Fri Mar 21 11:01:39 2014
 %                    (c) 2004 M. Visbeck & A. Thurnherr
-%                    uE-Info: 445 41 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 52 1 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 function [d,p]=loadctd(f,d,p)
@@ -49,7 +49,7 @@ f = setdefv(f,'ctd_badvals',-9e99);
 % 	0 for elapsed time in seconds
 % 	1 for year-day (1.0 = Jan 1, 00:00)
 % 	2 for Visbeck's Gregorian (see gregoria.m)
-p = setdefv(p,'ctd_time_base',0);
+f = setdefv(f,'ctd_time_base',0);
 
 %======================================================================
 
@@ -82,6 +82,7 @@ p = setdefv(p,'ctd_time_base',0);
 %   Sep 18, 2008: - BUG: moved code had assumed that nav data were loaded
 %   Jan  7, 2009: - tightened use of exist()
 %   Jun 16, 2009: - BUG: patching short nav time series did not work correctly
+%   Mar 21, 2014: - BUG: f.ctd_time_base used p.ctd_time_base set as default
 
 % read SEABIRD ctd timeseries file
 disp(['LOADCTD: load CTD time series ',f.ctd])

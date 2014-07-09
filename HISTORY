@@ -1,9 +1,9 @@
 ======================================================================
-                    C U R R E N T / H I S T O R Y 
+                    H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Wed Mar  5 13:46:26 2014
+                    dlm: Wed Jun 11 08:52:11 2014
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 230 36 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 238 48 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -229,3 +229,10 @@ IX_10:
 		- version updated to IX_10
 		- added Processing_HowTo.pdf
 		- uploaded for DIMES UK5
+
+IX_11:
+	Mar 21, 2014:
+		- updated version to IX_11beta in [default.m] [.hg/hgrc]
+		- minor bug fix in [loadctd.m]
+	Jun 11, 2014:
+		- changed savecdf default in [default.m]

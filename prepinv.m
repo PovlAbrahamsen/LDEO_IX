@@ -1,9 +1,9 @@
 %======================================================================
 %                    P R E P I N V . M 
 %                    doc: Wed Jan  7 16:46:29 2009
-%                    dlm: Fri Mar  5 15:49:35 2010
+%                    dlm: Mon Jun  9 17:03:32 2014
 %                    (c) 2009 A.M. Thurnherr
-%                    uE-Info: 735 17 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 677 74 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -13,6 +13,7 @@
 %			 was broken => removed
 %   		  - BUG: down/upcast separation bombed wen no CTD data were
 %			 available
+%   Jun  9, 2014: - improved messages
 
 function [di,p,d]=prepinv(d,p,dr)
 % function [di,p,d]=prepinv(d,p,dr)
@@ -98,14 +99,14 @@ if length(d.izu)>1
  hoff=compoff(u1d,u1u);
  % hoff=angle(u1d/u1u)*180/pi;
  p.up_dn_comp_off=hoff;
- disp([' mean compass offset based on velocity is ',num2str(hoff),' deg'])
+ disp([' mean heading offset from compasses = ',num2str(hoff),' deg'])
  
  % check tilt sensors
  % rotate by compass offset
   diary off
   hoff2=fminsearch('checktilt',0,[],[d.rol(2,:);d.pit(2,:);d.rol(1,:);d.pit(1,:)]);
   diary on
-  disp([' mean compass offset based on tilt is ',num2str(hoff2),' deg'])
+  disp([' mean heading offset from pitch/roll = ',num2str(hoff2),' deg'])
   p.up_dn_pit_rol_comp_off=hoff2;
   [d.rol(3,:),d.pit(3,:)]=uvrot(d.rol(2,:),d.pit(2,:),-hoff2);
   p.up_dn_rol_off=mean(d.rol(1,:)-d.rol(3,:));
@@ -673,7 +674,7 @@ di.ruvs(ii)=p.superens_std_min;
 disp([' set ',int2str(length(ii)),' values to minimum super ensemble std ',...
      num2str(p.superens_std_min)]);
 
-disp([' reduced ensemble size is ',int2str(length(di.z))])
+disp([' reduced profile length = ',int2str(length(di.z)),' super-ensemble bins'])
 if length(di.z)<5
 	error('not enough data to process station ')
 end
