@@ -1,9 +1,9 @@
 #======================================================================
 #                    . H G I G N O R E 
 #                    doc: Tue Oct 20 16:22:40 2009
-#                    dlm: Wed Mar  5 13:42:19 2014
+#                    dlm: Mon Feb 23 09:19:02 2015
 #                    (c) 2009 A.M. Thurnherr
-#                    uE-Info: 13 5 NIL 0 0 72 0 2 4 NIL ofnI
+#                    uE-Info: 14 4 NIL 0 0 72 0 2 4 NIL ofnI
 #======================================================================
 
 syntax: glob
@@ -11,3 +11,4 @@ syntax: glob
 *.ignore
 *.debugged
 HowTo
+.hg-disabled

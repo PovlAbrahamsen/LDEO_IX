@@ -41,9 +41,9 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %======================================================================
 %                    P R O C E S S _ C A S T . M 
 %                    doc: Thu Jun 24 16:54:23 2004
-%                    dlm: Thu Apr 26 11:02:01 2012
+%                    dlm: Fri Sep 26 15:57:32 2014
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 82 56 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 83 80 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % NOTES:
@@ -80,6 +80,7 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %  Sep 18, 2008: - BUG: p.navdata was non-existent field when no nav
 %			data were loaded
 %  Apr 26, 2012: - finally removed finestructure kz code
+%  Sep 26, 2014: - added support for p.orig in [saveres.m] (patch by Dan Torres)
 
 %----------------------------------------------------------------------
 % STEP 0: EXECUTE ALWAYS
@@ -544,7 +545,7 @@ if pcs.begin_step <= pcs.cur_step
     % save results to ASCII, MATLAB and NETCD files
     %
     disp(' save results ')
-    saveres(dr,p,ps,f)
+    saveres(dr,p,ps,f,d)
     da=savearch(dr,d,p,ps,f,att);
   
     %

@@ -1,9 +1,9 @@
 %======================================================================
 %                    G E T E R R . M 
 %                    doc: Wed Jun 30 23:24:51 2004
-%                    dlm: Wed Jul  6 20:26:14 2011
+%                    dlm: Wed Jan 28 09:46:12 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 19 35 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 21 42 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
@@ -17,6 +17,8 @@
 %		 - added ps.fig3_colormap, ps.fig3_err_y_axis, ps.fig3_avgerr
 %  Jun 30, 2011: - fixed fig.3 middle column plot title for median plot
 %  Jul  6, 2001: - fixed plot title
+%  Jan 25, 2015: - separated uc/dc in bin-averaged residual plots
+%  Jan 28, 2015: - BUG: figure legend typo
 
 function l=geterr(ps,dr,d,iplot)
 % function l=geterr(dr,d,iplot)
@@ -193,7 +195,10 @@ d.rv(ii)=nan;
    clf
    orient landscape
    
+% find downcast/upcast separation
+  btmi = fix(median(find(isfinite(l.u_oce(end,:)))));
 
+% define color map
    if ps.fig3_colormap == 2
      colormap(polarmap(21));
    else
@@ -232,11 +237,11 @@ d.rv(ii)=nan;
    
    subplot(232)
    if ps.fig3_avgerr == 2
-     plot(medianan(l.ru_err')',-ib)
-     title('median(U-err)')
+     plot(medianan(l.ru_err(:,1:btmi)')',-ib,'r',medianan(l.ru_err(:,btmi:end)')',-ib,'b');
+     title('median(U-err) [r/b: down-/up-cast]')
    else
-     plot(meannan(l.ru_err')',-ib)
-     title('mean(U-err)')
+     plot(meanan(l.ru_err(:,1:btmi)')',-ib,'r',meanan(l.ru_err(:,btmi:end)')',-ib,'b');
+     title('mean(U-err) [r/b: down-/up-cast]')
    end
    set(gca,'XLim',[-0.05 0.05]);
    set(gca,'Ylim',[-ib(end) -ib(1)]);
@@ -298,11 +303,11 @@ d.rv(ii)=nan;
    
    subplot(235)
    if ps.fig3_avgerr == 2
-     plot(medianan(l.rv_err')',-ib)
-     title('median(V-err)')
+     plot(medianan(l.rv_err(:,1:btmi)')',-ib,'r',medianan(l.rv_err(:,btmi:end)')',-ib,'b');
+     title('median(V-err) [r/b: down-/up-cast]')
    else
-     plot(meannan(l.rv_err')',-ib)
-     title('mean(V-err)')
+     plot(meanan(l.rv_err(:,1:btmi)')',-ib,'r',meanan(l.rv_err(:,btmi:end)')',-ib,'b');
+     title('mean(V-err) [r/b: down-/up-cast]')
    end
    set(gca,'XLim',[-0.05 0.05]);
    set(gca,'Ylim',[-ib(end) -ib(1)]);

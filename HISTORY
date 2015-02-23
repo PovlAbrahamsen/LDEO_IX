@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Wed Jun 11 08:52:11 2014
+                    dlm: Sun Jan 25 11:00:11 2015
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 238 48 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 251 57 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -234,5 +234,18 @@ IX_11:
 	Mar 21, 2014:
 		- updated version to IX_11beta in [default.m] [.hg/hgrc]
 		- minor bug fix in [loadctd.m]
+	Jun  9, 2014:
+		- improved messages in [prepinv.m]
 	Jun 11, 2014:
 		- changed savecdf default in [default.m]
+	Jul 13, 2014:
+		- enabled automatic editing in [edit_data.m] when blanking distance is zero 
+	Sep 26, 2014:
+		- modified [process_cast.m] and [saveres.m] to add support for
+		  p.orig (patch provided by D. Torres)
+	Jan 23, 2015:
+		- made [loadrdi.m] croak when UL file is not found
+		- added new editing to [edit_data.m]
+	Jan 25, 2015:
+		- separated uc/dc in bin-averaged residual plots in [geterr.m]
+		  to facilitate detection of package-wake effects

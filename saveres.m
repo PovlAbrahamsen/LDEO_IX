@@ -1,10 +1,25 @@
-function []=saveres(dr,p,ps,f)
-% function []=saveres(dr,p,ps,f)
+%======================================================================
+%                    S A V E R E S . M 
+%                    doc: Fri Sep 26 15:55:18 2014
+%                    dlm: Fri Sep 26 16:04:57 2014
+%                    (c) 2014 A.M. Thurnherr
+%                    uE-Info: 19 46 NIL 0 0 72 0 2 4 NIL ofnI
+%======================================================================
+
+function []=saveres(dr,p,ps,f,d)
+% function []=saveres(dr,p,ps,f,d)
 %
 % store LADCP result in RODB format
 %
 
-eval(['save ',[f.res,'.mat'],' dr p ps f'])
+% MODIFICTIONS BY ANT:
+%	Sep 26, 2014: - added support for p.orig (patch by Dan Torres)
+
+if p.orig == 1
+	eval(['save ',[f.res,'.mat'],' dr p ps f d'])
+else
+	eval(['save ',[f.res,'.mat'],' dr p ps f'])
+end
 
 % version 0.1	last change 28.6.2000
 % open file

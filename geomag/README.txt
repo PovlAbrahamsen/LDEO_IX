@@ -36,7 +36,13 @@ no longer needs to be specified on the command line.
 Rather than update the file parsing in geomag61.c, I deleted it,
 so now only magdec is provided.
 
+2010/08/20 EF
+Added a Makefile.mingw32cross, so that with the ubuntu mingw32 cross
+compiler packages installed, one can generate magdec.exe via:
 
+make -f Makefile.mingw32cross
+
+This will leave magdec.exe in the current directory.
 
 
 =============== Original README.txt below this line ===================

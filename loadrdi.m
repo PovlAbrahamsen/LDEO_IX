@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Mon Jun 24 10:17:29 2013
+%                    dlm: Fri Jan 23 16:07:24 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 48 72 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 823 0 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -46,6 +46,7 @@ function [d,p,de]=loadrdi(f,p)
 %  Aug 18, 2011: - added comment to coord-transformation code (gimbal pitch)
 %  Jun 24, 2013: - blen re-added but separately for DL/UL
 %		 - added separate nbin, blnk, dist for DL/UL to p struct
+%  Jan 23, 2015: - made updown() bomb when UL file is not found
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -796,14 +797,15 @@ dproblem(i) = dproblem(i) + 100;
 % load upward looking ADCP
 up = nargin>1;
 
-if up
-  fid = fopen(fup,'r','l');
-  if fid == -1
-    up = 0;
-  end
+if strcmp(fup,'') || strcmp(fup,' ')
+  up = 0;
 end
 
 if up
+  fid = fopen(fup,'r','l');
+  if fid == -1
+    error(sprintf('%s: no such file or directory',fup));
+  end
 
   if length(bmax)<2, bmax(2)=bmax(1); end
   disp([' loading up-data ',fup])

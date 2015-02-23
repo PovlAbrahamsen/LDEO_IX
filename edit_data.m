@@ -15,13 +15,17 @@ function d = edit_data(d,p)
 %		 - disabled edit_spike_filter by default
 %		 - changed edit_spike_filter_max_curv default value
 %  Aug 13, 2013: - BUG: edit_sidelobes did not work for UL only data
+%  Jul 13, 2014: - automatically edit bins 1 when blanking distance is zero
+%  Jan 23, 2015: - BUG: automatic zero blanking editing had a typo
+%		 - BUG: automatic zero blanking editing did not work with DL-only data
+%		 - added p.edit_{dn,up}_bad_ensembles
 
 %======================================================================
 %                    E D I T _ D A T A . M 
 %                    doc: Sat Jul  3 17:13:05 2004
-%                    dlm: Tue Aug 13 15:34:27 2013
+%                    dlm: Fri Jan 23 21:40:14 2015
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 122 0 NIL 0 0 72 3 2 8 NIL ofnI
+%                    uE-Info: 93 23 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 %----------------------------------------------------------------------
@@ -81,9 +85,28 @@ p=setdefv(p,'edit_PPI_max_hab',1000);
 % [0 0 1 1].
 p=setdefv(p,'edit_skip_ensembles',[]);
 
+% the following vectors can be used to edit out blocks of bad ensembles,
+% caused, for example, by intermittent hardware failures. NOTE: it is
+% assumed that the ensembles are numbered consecutively, starting with 1,
+% i.e. the ensemble numbers in the data files are ignored. This may 
+% not work as intended if the data files are trimmed during the DL/UL
+% merge in [loardrdi.m]
+
+p=setdefv(p,'edit_dn_bad_ensembles',[]);
+p=setdefv(p,'edit_up_bad_ensembles',[]);
+
 %----------------------------------------------------------------------
 % Bin Masking
 %----------------------------------------------------------------------
+
+if length(d.zu)>0 && p.blnk_u==0
+  disp(sprintf(' bin masking               : masking uplooker bin 1 because of zero blanking distance'));
+  p.edit_mask_up_bins = [1 p.edit_mask_up_bins];
+end
+if p.blnk_d==0
+  disp(sprintf(' bin masking               : masking downlooker bin 1 because of zero blanking distance'));
+  p.edit_mask_dn_bins = [1 p.edit_mask_dn_bins];
+end
 
 if ~isempty(p.edit_mask_dn_bins) | ~isempty(p.edit_mask_up_bins)
 
@@ -255,6 +278,28 @@ if ~isempty(p.edit_skip_ensembles)
   disp(sprintf(' ensemble skipping         : set %d weights to NaN',nskipped));
 
 end % if p.edit_skip_ensembles enabled
+
+%----------------------------------------------------------------------
+% remove blocks of bad ensembles from UL and/or DL data
+%----------------------------------------------------------------------
+
+if ~isempty(p.edit_dn_bad_ensembles) || ~isempty(p.edit_up_bad_ensembles)
+  if ~isempty(p.edit_dn_bad_ensembles)
+    dn_bad = 0; ibad = p.edit_dn_bad_ensembles;
+    for b=length(d.zu)+1:length(d.zu)+length(d.zd)
+      dn_bad = dn_bad + length(find(isfinite(d.weight(b,ibad))));
+      d.weight(b,ibad) = NaN; d.ts_edited(b,ibad) = NaN;
+    end
+  end
+  if ~isempty(p.edit_up_bad_ensembles)
+    up_bad = 0; ibad = p.edit_up_bad_ensembles;
+    for b=length(d.zu):-1:1
+      up_bad = up_bad + length(find(isfinite(d.weight(b,ibad))));
+      d.weight(b,ibad) = NaN; d.ts_edited(b,ibad) = NaN;
+    end
+  end
+  disp(sprintf(' DL/UL ensemble editing    : set %d/%d weights to NaN',dn_bad,up_bad));
+end
 
 %----------------------------------------------------------------------
 % Plot Results of Editing
