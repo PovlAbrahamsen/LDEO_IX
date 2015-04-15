@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Fri Jan 23 16:07:24 2015
+%                    dlm: Wed Apr 15 09:53:54 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 823 0 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 260 45 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -47,6 +47,7 @@ function [d,p,de]=loadrdi(f,p)
 %  Jun 24, 2013: - blen re-added but separately for DL/UL
 %		 - added separate nbin, blnk, dist for DL/UL to p struct
 %  Jan 23, 2015: - made updown() bomb when UL file is not found
+%  Apr 15, 2015: - modified ambiguity-velocity warning as suggested by Diana Cardoso
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -256,12 +257,13 @@ skipnens = 1200 / enstime;
 jj = find(j2>skipnens & j2<size(l.u,2)-skipnens);
 
 if length(jj)>10
- warn=['**  found  ',int2str(length(jj)),'  horizontal velocities > ' int2str(p.vlim) 'm/s in middle hour of cast'];
+ warn = sprintf('** found %d (%.1f%% of total) relative horizontal velocities > %g m/s',...
+		length(jj),length(jj)/length(vel)*100,p.vlim);
  disp(warn);
  if length(jj)>100
   p.warn(size(p.warn,1)+1,1:length(warn))=warn;
  end
- disp('** WARNING  check maximum velocity setting on CMD-file   ** ')
+ disp('** WARNING  check ambiguity velocity setting in CMD-file   ** ')
 end
 if p.orig
  d.l.problem(j) = d.l.problem(j)+1;

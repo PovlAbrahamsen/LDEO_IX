@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Sun Jan 25 11:00:11 2015
+                    dlm: Wed Apr 15 08:56:15 2015
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 251 57 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 254 49 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -249,3 +249,6 @@ IX_11:
 	Jan 25, 2015:
 		- separated uc/dc in bin-averaged residual plots in [geterr.m]
 		  to facilitate detection of package-wake effects
+	Apr 15, 2015:
+		- modified ambiguity-velocity warning message in [loadrdi.m]
+		  following a suggestion of Diana Cardoso
