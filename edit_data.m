@@ -19,13 +19,14 @@ function d = edit_data(d,p)
 %  Jan 23, 2015: - BUG: automatic zero blanking editing had a typo
 %		 - BUG: automatic zero blanking editing did not work with DL-only data
 %		 - added p.edit_{dn,up}_bad_ensembles
+%  Jul 21, 2015: - made bin-masking more permissive (allow indices > #bins)
 
 %======================================================================
 %                    E D I T _ D A T A . M 
 %                    doc: Sat Jul  3 17:13:05 2004
-%                    dlm: Fri Jan 23 21:40:14 2015
+%                    dlm: Tue Jul 21 11:39:18 2015
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 93 23 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 126 23 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 %----------------------------------------------------------------------
@@ -113,16 +114,20 @@ if ~isempty(p.edit_mask_dn_bins) | ~isempty(p.edit_mask_up_bins)
   nbad = 0;
   if length(d.zu) > 0
     for bi=1:length(p.edit_mask_up_bins)
-      bn = length(d.zu)+1 - p.edit_mask_up_bins(bi);
-      nbad = nbad + length(find(isfinite(d.weight(bn,:))));
-      d.weight(bn,:) = NaN; d.ts_edited(bn,:) = NaN;
+      if p.edit_mask_up_bins(bi)<=p.nbin_u
+         bn = length(d.zu)+1 - p.edit_mask_up_bins(bi);
+	 nbad = nbad + length(find(isfinite(d.weight(bn,:))));
+	 d.weight(bn,:) = NaN; d.ts_edited(bn,:) = NaN;
+      end
     end
   end
   if length(d.zd) > 0
     for bi=1:length(p.edit_mask_dn_bins)
-      bn = length(d.zu) + p.edit_mask_dn_bins(bi);
-      nbad = nbad + length(find(isfinite(d.weight(bn,:))));
-      d.weight(bn,:) = NaN; d.ts_edited(bn,:) = NaN;
+      if p.edit_mask_dn_bins(bi)<=p.nbin_d
+        bn = length(d.zu) + p.edit_mask_dn_bins(bi);
+	nbad = nbad + length(find(isfinite(d.weight(bn,:))));
+	d.weight(bn,:) = NaN; d.ts_edited(bn,:) = NaN;
+      end
     end
   end
 

@@ -1,9 +1,9 @@
 %======================================================================
 %                    B E G I N _ P R O C E S S I N G _ S T E P . M 
 %                    doc: Fri Jun 25 16:13:41 2004
-%                    dlm: Thu Jun 26 13:47:02 2008
+%                    dlm: Wed Apr 22 08:10:18 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 13 50 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 15 58 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % start new processing step (in [process_cast.m])
@@ -11,6 +11,8 @@
 % HISTORY:
 %   Jun 25, 2004: - created
 %   Jun 26, 2008: - BUG: typo related to eval_expr
+%   Apr 22, 2015: - added evaluation of eval_expr before re-loading set_cast_params.m
+%		    to allow setting of processing_version
 
 msg = sprintf('#################### step %d: %s ',pcs.cur_step,pcs.step_name);
 while length(msg)<70, msg = [msg '#']; end
@@ -19,10 +21,14 @@ if pcs.cur_step == pcs.begin_step
   save_pcs = pcs; % save state
   disp(sprintf('LOADING CHECKPOINT %s_%d',f.checkpoints,pcs.cur_step-1));
   load(sprintf('%s_%d',f.checkpoints,pcs.cur_step-1));
+  if ~isempty(save_pcs.eval_expr)
+    disp(sprintf('EVALUATING EXPRESSION <%s>...',save_pcs.eval_expr));
+    eval(save_pcs.eval_expr);
+  end
   disp('RE-LOADING PER-CAST PARAMETERS');
   set_cast_params;
   if ~isempty(save_pcs.eval_expr)
-    disp(sprintf('EVALUATING EXPRESSION <%s>...',save_pcs.eval_expr));
+    disp(sprintf('RE-EVALUATING EXPRESSION <%s>...',save_pcs.eval_expr));
     eval(save_pcs.eval_expr);
   end
   pcs = save_pcs; % restore state

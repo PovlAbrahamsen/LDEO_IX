@@ -8,9 +8,9 @@ function [p,dr,ps,de,der]=getinv(di,p,ps,dr,iplot)
 %======================================================================
 %                    G E T I N V . M 
 %                    doc: Thu Jun 17 15:36:21 2004
-%                    dlm: Fri Jan  6 11:57:45 2012
+%                    dlm: Thu Jul 23 14:06:09 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 31 50 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 292 1 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % CHANGE HISTORY:
@@ -29,6 +29,9 @@ function [p,dr,ps,de,der]=getinv(di,p,ps,dr,iplot)
 % Jan  6, 2012: - lesqchol removed because it does not deal with
 %		  nearly singular matrices gracefully
 %		- BUG: replaced all imag() by new imagnan()
+% Jul 28, 2014: - modified how to specify smallfac
+% Aug  9, 2014: - modified how to specify dragfac (+ve for fixed; -ve for scaled Martin's default)
+% Jul 23, 2015: - commented on bug below (#!#)
 
 if nargin<5, iplot=0; end
 
@@ -46,16 +49,31 @@ ps=setdefv(ps,'barofac',1);
 % how strong do you believe in the simple wire dynamics (not very good yet)
 %ps=setdefv(ps,'dragfac',tanh(p.maxdepth/3000)*0.2);
 ps=setdefv(ps,'dragfac',0);
+
+% negative values weigh Martin's original default
+if (ps.dragfac < 0)
+  ps.dragfac = -ps.dragfac * tanh(p.maxdepth/3000)*0.2;
+end
+
 % how much do you want to smooth the ocean profile
 ps=setdefv(ps,'smoofac',0);
-% how much do you want to smooth the ocean profile
-imax=ceil(p.maxdepth/500);
-smallfac=[0 0];
-for i=1:imax
- smallfac(i,1)=i;
- smallfac(i,2)=0.02/(1+abs(i-(imax/2)))*tanh(p.maxdepth/3000);
-end
-ps=setdefv(ps,'smallfac',smallfac);
+
+% how much do you want to restrict large shears on short vertical wavelengths
+%  	ps.smallfac(1) is the vertical-wavelength filter cutoff
+%	ps.smallfac(2) is the filter strength (larger implies more filtering)
+
+%ps=setdefv(ps,'smallfac',[500 0.02]);		% Martin's defaults
+%ps=setdefv(ps,'smallfac',[200 0.02]);		% works reasonably well for DoMORE1 data
+
+ps=setdefv(ps,'smallfac',[99999 0]);		% default: disable
+
+    imax = ceil(p.maxdepth/ps.smallfac(1));
+    smallfac = [0 0];
+    for i=1:imax
+	smallfac(i,1) = i;
+	smallfac(i,2) = ps.smallfac(2)/(1+abs(i-(imax/2)))*tanh(p.maxdepth/3000);
+    end
+    
 % do you want up/down cast seperately then set to 1
 ps=setdefv(ps,'down_up',1);
 % decide how to weight data
@@ -269,6 +287,9 @@ end
 
 [jmax,jbott]=max(izv);
 
+%#!# the following line is wrong, as izv>(ps.dz*(jmax-1) is never true;
+%#!# the code is supposed to remove the "last data bin" (whatever that means)
+%#!# but it does not do anything
 ii=find(izv<(ps.dz) | izv>(ps.dz*(jmax-1)) | izv>(zbottom-ps.dz));
 wm(ii)=0;
 
@@ -467,8 +488,8 @@ de.type_constraints=[de.type_constraints;'GPS naviga'];
 
 
 %### small deep ocean velocity
-if sum(ps.smallfac(:,2))>0
- [A2,A1,d]=lainsmal(A2,A1,d,ps.smallfac);
+if sum(smallfac(:,2))>0
+ [A2,A1,d]=lainsmal(A2,A1,d,smallfac);
 end
 
 de.ocean_constraints=[de.ocean_constraints;sum(abs(A2))-sum(de.ocean_constraints)];

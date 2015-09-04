@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D S A D C P . M 
 %                    doc: Sun Jun 27 23:42:04 2004
-%                    dlm: Tue May 22 11:01:21 2012
+%                    dlm: Fri Jun 12 11:35:40 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 109 4 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 97 33 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -15,6 +15,8 @@
 %		   because these data are unlikely to be accurate enough
 %		   for the ship-drift constraint; if they are, the user
 %		   should verify and make a GPS file during pre-processing
+%  Jun 12, 2015: - added code to set p.lat and p.lon when only SADCP 
+%		   nav data are available
 
 function   [di,p]=loadsadcp(f,di,p)
 % function   [di,p]=loadsadcp(f,di,p)
@@ -89,28 +91,34 @@ if existf(f,'sadcp')==1
   di.sadcp_lat=interp1(tim_sadcp,lat_sadcp(:),di.time_jul);
 
   % set position from SADCP nav
+  % NB: this is only used to set lat lon in the output files; magdev is NOT calculated from these
   if abs(p.lon)+abs(p.lat)==0
-   error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
-   slat=di.sadcp_lat(1);
-   slon=di.sadcp_lon(1);
-   elat=di.sadcp_lat(end);
-   elon=di.sadcp_lon(end);
-   p.poss=[fix(slat), (slat-fix(slat))*60, fix(slon), (slon-fix(slon))*60];
-   p.pose=[fix(elat), (slat-fix(elat))*60, fix(elon), (slon-fix(elon))*60];
+    p.lon = medianan(di.sadcp_lon);
+    p.lat = medianan(di.sadcp_lat);
   end
+
+%  if abs(p.lon)+abs(p.lat)==0
+%   error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
+%   slat=di.sadcp_lat(1);
+%   slon=di.sadcp_lon(1);
+%   elat=di.sadcp_lat(end);
+%   elon=di.sadcp_lon(end);
+%   p.poss=[fix(slat), (slat-fix(slat))*60, fix(slon), (slon-fix(slon))*60];
+%   p.pose=[fix(elat), (slat-fix(elat))*60, fix(elon), (slon-fix(elon))*60];
+%  end
  
-% if no other ship navigation exists, use SADCP navigation
-  if existf(di,'slon')==0
-   error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
-   di.slon=di.sadcp_lon;
-   di.slat=di.sadcp_lat;
-  else
-   if sum(isfinite(di.slon+di.slat))==0
-    error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
-    di.slon=di.sadcp_lon;
-    di.slat=di.sadcp_lat;
-   end
-  end
+%% if no other ship navigation exists, use SADCP navigation
+%  if existf(di,'slon')==0
+%   error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
+%   di.slon=di.sadcp_lon;
+%   di.slat=di.sadcp_lat;
+%  else
+%   if sum(isfinite(di.slon+di.slat))==0
+%    error('as of version IX_9, using GPS info from SADCP data stream is no longer supported');
+%    di.slon=di.sadcp_lon;
+%    di.slat=di.sadcp_lat;
+%   end
+%  end
 
   if length(find(isfinite(u_sadcp(:,ii))))<1, 
    disp(' no finite SADCP data found ')

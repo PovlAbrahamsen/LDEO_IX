@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Wed Apr 15 08:56:15 2015
+                    dlm: Mon Jul 27 15:50:13 2015
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 254 49 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 276 37 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -252,3 +252,25 @@ IX_11:
 	Apr 15, 2015:
 		- modified ambiguity-velocity warning message in [loadrdi.m]
 		  following a suggestion of Diana Cardoso
+		- implemented fixes for bugs reported by Achim Randelhoff via
+  		  yahoo email on 04/23/2014 [getinv.m] [plotraw.m]
+	Apr 22, 2015:
+		- modified [begin_processing_step.m] to evaluate the expression
+		  provided as an argument before re-loading [set_cast_params.m]
+	May  8, 2015:
+		- folded in DoMORE-1 [getinv.m] with changes to dragfac
+		  and smallfac
+	May 12, 2015:
+		- finally removed step 16 from [process_cast.m]
+	May 27, 2015:
+		- updated diagnostic mesages in [loadctd.m] [loadrdi.m]
+	May 28, 2015:
+		- added error message to [loadctd.m]
+	Jun 12, 2015:
+		- set p.lat and p.lon if only SADCP gps data are available
+	Jul 21, 2015:
+		- [edit_data.m] made bin masking more permissive
+	Jul 27, 2015:
+		- replaced [ladcp2cdf.m] with homegrown alternative that is
+		  *not* consistent with old format; Diana Cardoso and EF are
+		  working on replacement code

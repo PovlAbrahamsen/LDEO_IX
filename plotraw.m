@@ -6,15 +6,17 @@ function p=plotraw(d,p)
 %======================================================================
 %                    P L O T R A W . M 
 %                    doc: Fri Jan  5 15:38:43 2007
-%                    dlm: Mon Jun  3 14:09:21 2013
+%                    dlm: Wed Apr 15 11:30:50 2015
 %                    (c) 2007 M. Visbeck with contribs from A. Thurnherr
-%                    uE-Info: 79 0 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 19 76 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
 %	Jan  5, 2007: - fixed checkbeam() as suggested by B. Huber
 %	Jun  3, 2013: - BUG: top panel of Fig. 2 was wrong for dual-headed
 %						 LADCPs with different UL/DL bin sizes
+%	Apr 15, 2015: - BUG: ax() is always used but only sometimes defined()
+%						 reported by Achim Randelhoff (yahoo email 04/23/14)
 
 pmax=200;
 orient tall
@@ -74,6 +76,8 @@ if (length(d.izu) > 0)
 	ax(4) = -zz(end);
 	axis(ax);
 	pcolorn(ii,zz(length(d.izu)+1:end),rw(length(d.izu)+1:end,:))
+else
+	ax = axis;	% alternative solution to bug reported by Achim Randelhoff yahoo email 04/23/2014
 end
 
 hold on

@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Wed Apr 15 09:53:54 2015
+%                    dlm: Wed May 27 08:17:42 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 260 45 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 51 41 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -48,6 +48,7 @@ function [d,p,de]=loadrdi(f,p)
 %		 - added separate nbin, blnk, dist for DL/UL to p struct
 %  Jan 23, 2015: - made updown() bomb when UL file is not found
 %  Apr 15, 2015: - modified ambiguity-velocity warning as suggested by Diana Cardoso
+%  May 27, 2015: - clarified time-related warnings
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -257,7 +258,7 @@ skipnens = 1200 / enstime;
 jj = find(j2>skipnens & j2<size(l.u,2)-skipnens);
 
 if length(jj)>10
- warn = sprintf('** found %d (%.1f%% of total) relative horizontal velocities > %g m/s',...
+ warn = sprintf('** found %d (%.1f%% of total) velocity measurements > %g m/s',...
 		length(jj),length(jj)/length(vel)*100,p.vlim);
  disp(warn);
  if length(jj)>100
@@ -888,27 +889,25 @@ if up
   if pingdiff | timediff | pingconst
    disp(' WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING ')
    if pingconst
-    warn=(' warning ping rate not equal in down instrument');
+    warn=(' Warning: non-constant ping rate in downlooker data (staggered pinging?)');
     disp(warn)
     disp(['  min down ping rate :',num2str(-24*3600*maxnan(-diff(timd))),...
          '  max down ping rate :',num2str(24*3600*maxnan(diff(timd)))])
    end
    if pingdiff
-    warn=(' warning mean ping rate not equal between both instruments ');
+    warn=(' Warning: mean ping rates differ in downlooker/uplooker data ');
     disp(warn)
     l.warn(size(l.warn,1)+1,1:length(warn))=warn;
     disp(['  mean down ping rate :',num2str(24*3600*meannan(diff(timd))),...
          '  mean up ping rate :',num2str(24*3600*meannan(diff(timu)))])
    end
    if timediff
-    warn=(' warning instruments have no fixed ping rate ');
+    warn=(' Warning: cast duration differs in downlooker/uplooker data ');
     disp(warn)
     l.warn(size(l.warn,1)+1,1:length(warn))=warn;
     disp(['  down dt for common ping number:',num2str((timd(ii)-timd(1))*24),...
           '  up dt :',num2str((timu(ii)-timu(1))*24),' hours '])
    end
-   %timd=timd-timd(1);
-   %timu=timu-timu(1);
    iu=1:length(timd);
    ii=find(iu>length(timu));
    iu(ii)=length(timu);

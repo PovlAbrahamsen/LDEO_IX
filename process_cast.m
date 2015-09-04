@@ -34,16 +34,15 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 % 13: (RE-)LOAD SADCP DATA
 % 14: CALCULATE INVERSE SOLUTION
 % 15: CALCULATE SHEAR SOLUTION
-% 16: CALCULATE DIFFUSIVITY PROFILE
-% 17: PLOT RESULTS & SHOW WARNINGS
-% 18: SAVE OUTPUT
+% 16: PLOT RESULTS & SHOW WARNINGS
+% 17: SAVE OUTPUT
 
 %======================================================================
 %                    P R O C E S S _ C A S T . M 
 %                    doc: Thu Jun 24 16:54:23 2004
-%                    dlm: Fri Sep 26 15:57:32 2014
+%                    dlm: Tue May 12 08:36:53 2015
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 83 80 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 378 0 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % NOTES:
@@ -81,6 +80,7 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %			data were loaded
 %  Apr 26, 2012: - finally removed finestructure kz code
 %  Sep 26, 2014: - added support for p.orig in [saveres.m] (patch by Dan Torres)
+%  May 12, 2015: - finally removed entire step 16 (diffusivity)
 
 %----------------------------------------------------------------------
 % STEP 0: EXECUTE ALWAYS
@@ -368,6 +368,13 @@ if pcs.begin_step <= pcs.cur_step
      dino=di;
      lanarrow
      diary on
+     if existf(d,'ctdprof_p')
+       dr.ctd_t=interp1q(d.ctdprof_z,d.ctdprof_t,dr.z);
+       dr.ctd_s=interp1q(d.ctdprof_z,d.ctdprof_s,dr.z);
+     end
+     if existf(d,'ctdprof_ss')
+       dr.ctd_ss=interp1q(d.ctdprof_z,d.ctdprof_ss,dr.z);
+     end
   end
 
   end_processing_step;
@@ -459,30 +466,7 @@ if pcs.begin_step <= pcs.cur_step
 end % OF STEP 15: CALCULATE SHEAR SOLUTION
 
 %----------------------------------------------------------------------
-% STEP 16: CALCULATE DIFFUSIVITY PROFILE
-%----------------------------------------------------------------------
-
-pcs.cur_step = pcs.cur_step + 1;
-if pcs.begin_step <= pcs.cur_step
-  pcs.step_name = 'CALCULATE DIFFUSIVITY PROFILE'; begin_processing_step;
-
-  % 
-  %  prepare ctd data for output
-  %
-  if existf(d,'ctdprof_p')
-   % first save CTD data with profile
-   dr.ctd_t=interp1q(d.ctdprof_z,d.ctdprof_t,dr.z);
-   dr.ctd_s=interp1q(d.ctdprof_z,d.ctdprof_s,dr.z);
-  end
-  if existf(d,'ctdprof_ss')
-   dr.ctd_ss=interp1q(d.ctdprof_z,d.ctdprof_ss,dr.z);
-  end
-  
-  end_processing_step;
-end % OF STEP 16: CALCULATE DIFFUSIVITY PROFILE
-
-%----------------------------------------------------------------------
-% STEP 17: PLOT RESULTS & SHOW WARNINGS
+% STEP 16: PLOT RESULTS & SHOW WARNINGS
 %----------------------------------------------------------------------
 
 pcs.cur_step = pcs.cur_step + 1;
@@ -529,10 +513,10 @@ if pcs.begin_step <= pcs.cur_step
   pause(0.01)
 
   end_processing_step;
-end % OF STEP 17: PLOT RESULTS & SHOW WARNINGS
+end % OF STEP 16: PLOT RESULTS & SHOW WARNINGS
 
 %----------------------------------------------------------------------
-% STEP 18: SAVE OUTPUT
+% STEP 17: SAVE OUTPUT
 %----------------------------------------------------------------------
 
 pcs.cur_step = pcs.cur_step + 1;
@@ -584,7 +568,7 @@ if pcs.begin_step <= pcs.cur_step
   end
     
   end_processing_step;
-end % OF STEP 18: SAVE OUTPUT
+end % OF STEP 17: SAVE OUTPUT
 
 %----------------------------------------------------------------------
 % FINAL STEP: CLEAN UP

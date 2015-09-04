@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D C T D . M 
 %                    doc: Sat Jun 26 15:56:43 2004
-%                    dlm: Fri Mar 21 11:01:39 2014
+%                    dlm: Thu May 28 07:51:39 2015
 %                    (c) 2004 M. Visbeck & A. Thurnherr
-%                    uE-Info: 52 1 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 169 24 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 function [d,p]=loadctd(f,d,p)
@@ -83,6 +83,8 @@ f = setdefv(f,'ctd_time_base',0);
 %   Jan  7, 2009: - tightened use of exist()
 %   Jun 16, 2009: - BUG: patching short nav time series did not work correctly
 %   Mar 21, 2014: - BUG: f.ctd_time_base used p.ctd_time_base set as default
+%   May 27, 2015: - removed confusing diagnostic message regarding adjusting NAV time
+%   May 28, 2015: - added error message when there are no valid vertical velocities
 
 % read SEABIRD ctd timeseries file
 disp(['LOADCTD: load CTD time series ',f.ctd])
@@ -164,6 +166,9 @@ end
 
 % calc LADCP depth
 w=meannan(d.rw);
+if sum(isfinite(w)) == 0
+    error('No valid vertical velocities --- aborting');
+end
 ii=find(~isfinite(w));
 w(ii)=0;
 dt=diff(d.time_jul)*24*3600;
@@ -204,8 +209,10 @@ if abs(delta_t)>60
   timctd = timctd + p.ctdtimoff;
 end
 
-if p.navdata & f.nav_time_base == 0
-  disp(sprintf(' adjusting GPS time to CTD time (%+d seconds)',floor(p.ctdtimoff*24*3600)))
+if p.navdata && f.nav_time_base == 0
+  if ~strcmp(f.ctd,f.nav)
+    disp(sprintf(' adjusting GPS time to CTD time (%+d seconds)',floor(p.ctdtimoff*24*3600)))
+  end
   d.navtime_jul = d.navtime_jul + p.ctdtimoff;
 end
 
