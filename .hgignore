@@ -1,9 +1,9 @@
 #======================================================================
 #                    . H G I G N O R E 
 #                    doc: Tue Oct 20 16:22:40 2009
-#                    dlm: Mon Feb 23 09:19:02 2015
+#                    dlm: Wed Nov 25 14:15:17 2015
 #                    (c) 2009 A.M. Thurnherr
-#                    uE-Info: 14 4 NIL 0 0 72 0 2 4 NIL ofnI
+#                    uE-Info: 16 7 NIL 0 0 72 0 2 4 NIL ofnI
 #======================================================================
 
 syntax: glob
@@ -12,3 +12,5 @@ syntax: glob
 *.debugged
 HowTo
 .hg-disabled
+ladcp2cdf
+Private

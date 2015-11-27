@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Mon Jul 27 15:50:13 2015
+                    dlm: Fri Nov 27 17:39:30 2015
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 276 37 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 284 30 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -274,3 +274,12 @@ IX_11:
 		- replaced [ladcp2cdf.m] with homegrown alternative that is
 		  *not* consistent with old format; Diana Cardoso and EF are
 		  working on replacement code
+	Nov 25, 2015:
+		- replaced [ladcp2cdf.m] with a version written by Diana and
+		  checked by Eric; this update adds [add_struct.m] to the
+		  distribution 
+		- updated version to IX_11 in [default.m] [.hg/hgrc]
+	Nov 26, 2015:
+		- BUG in [ladcp2cdf.m]
+		- commit version IX_11		
+

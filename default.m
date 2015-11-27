@@ -1,9 +1,9 @@
 %======================================================================
 %                    D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Wed Jun 11 08:52:24 2014
+%                    dlm: Wed Nov 25 14:13:51 2015
 %                    (c) 2004 ladcp@
-%                    uE-Info: 18 16 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 36 0 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -17,6 +17,7 @@
 %	Mar  5, 2014: - updated version to IX_10
 %	Mar 21, 2014  - updated version to IX_11beta
 %	Jun 11, 2014: - changed savecdf default to 0
+%	Nov 25, 2015: - change version to IX_11
 
 % LADCP processing software
 % M. Visbeck. LDEO/2003
@@ -32,7 +33,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_11beta';
+p.software='LDEO LADCP software: Version IX_11';
 
 % file names
 % f.ladcpdo  is the ONLY required input

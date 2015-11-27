@@ -1,250 +1,234 @@
+function [] = ladcp2cdf(fname,dr_struct,da,p,ps,f,att);
+% function [] = ladcp2cdf(fname,dr_struct,da,p,ps,f,att);
+%
+% function to save LADCP data into a netcdf file for MatLab version 2012a
+%
+% input  :	fname		- output filename
+%			dr_struct	- main inversion results (velocity profiles)
+%			da,p,ps,f,att - arbitrary metadata structures
+%
+% Subroutine :  add_struct
+
+% Created By:   Diana Cardoso, Bedford Institute of Oceangraphy
+%               Diana.Cardoso@dfo-mpo.gc.ca
+% Description:  Based on LDEO software to Process LADCP, version IX.8,
+%               script ladcp2cdf.m version 0.1	last change 08.03.2002. 
+%               maintained by A.M. Thurnherr and downloaded from:
+%       http://www.ldeo.columbia.edu/cgi-bin/ladcp-cgi-bin/hgwebdir.cgi
+%       The function ladcp2cdf was changed to run with the the Matlab
+%       version 2012, which now supports netcdf.
+
 %======================================================================
-%                    L A D C P 2 C D F _ V 2 . M 
-%                    doc: Fri Jul 24 09:31:43 2015
-%                    dlm: Mon Jul 27 15:47:29 2015
-%                    (c) 2015 A.M. Thurnherr
-%                    uE-Info: 21 0 NIL 0 0 72 2 2 8 NIL ofnI
+%                    L A D C P 2 C D F . M 
+%                    doc: Thu Aug 15 10:52:55 2013
+%                    dlm: Thu Nov 26 22:01:32 2015
+%                    (c) 2013 A.M. Thurnherr, from code contributed by D. Cardoso
+%                    uE-Info: 183 0 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
+
+% NOTES:
+%	- This version creates slightly different files than the original version
+%	  created by Visbeck/Krahmann. In the original version, the contents of the
+%	  dr structure end up as top-level variables and the contents of
+%	  the da, p, ps, f and att structures end of as global attributes. In 
+%	  the new version, the latter are saved as sub-structures, with _struct appended
+%	  to the internal names to avoid conflicts.
 
 % HISTORY:
-%  Jul 24, 2015: - created, losely based on code provided by D. Cardoso
-%  Jul 27, 2015: - reverted to Martin's original dimensions as requested
-%		   by E. Firing
+%   Aug 15, 2013: - incorporated this code, supplied Diana Cardoso, into IX_10beta
+%		  - modified doc in header
+%		  - renamded struct variable to dr_struct
+%		  - removed 'cd' in and out of results directory (pathnames work just fine)
+%		  - delete netcdfile before it is written to (old 'clobber' option)
+%		  - removed 'l' suffix from all dims
+%		  - replaced yes/no logical vals by true/false
+%		  - renamed substructures from st2..st6 to internal names (da,p,ps,f,att)
+%   Aug 28, 2013: - incorporated bug fix provided by Diana Cardoso to prevent lat,lon,name and 
+%		    date to be stored 2cd in the nc file, which can make the code
+%		    bomb if the length of any other var is 6 (or equal to the length of name?)
+%   Nov     2015: - new coded provided by Diana Cardoso (with support from Eric Firing)
+%   Nov 26, 2015: - BUG: code did not work when bottom-track data were missing
+%--------------------------------------------------------------------------
+% check arguments and remove existing NetCDF file with fname(output filename)
+%--------------------------------------------------------------------------
 
-function [] = ladcp2cdf(fname,dr,da,p,ps,f,att);
-    netcdfile = deblank(fname);
-    if exist(netcdfile,'file'), delete(netcdfile); end
-
-    add_dr_struct(netcdfile,'dr',dr,att)
-    add_struct(netcdfile,'da',da)
-    add_struct(netcdfile,'p',p)
-    add_struct(netcdfile,'ps',ps)
-    add_struct(netcdfile,'f',f)
+if nargin<2
+  error('need two input arguments')
+end
+if ~isstruct(dr_struct)
+  error('second argument must be a dr structure')
 end
 
-%----------------------------------------------------------------------
+netcdfile = deblank(fname); %remove any blanks from string end
+if exist(netcdfile,'file')
+	delete(netcdfile)
+end
+%--------------------------------------------------------------------------
+%Create a classic format NetCDF file with 8 dimension definitions.
+%--------------------------------------------------------------------------
 
-function [] = addatts(ncf,fnm,att)
-    as = getfield(att,fnm);
-    an = fieldnames(as);
-    for i=1:length(an)
-    	ncwriteatt(ncf,sprintf('dr.%s',fnm),char(an(i)),char(getfield(as,char(an(i)))));
+mySchema.Name   = '/'; % indicating the full file as opposed to a group
+mySchema.Format = 'classic'; %The format of the NetCDF file
+%Create Dimensions
+mySchema.Dimensions(1).Name   = 'name';
+mySchema.Dimensions(1).Length = length(getfield(dr_struct,'name'));
+mySchema.Dimensions(2).Name   = 'date';
+mySchema.Dimensions(2).Length = 6;
+mySchema.Dimensions(3).Name   = 'lat';
+mySchema.Dimensions(3).Length = 1;
+mySchema.Dimensions(4).Name   = 'lon';
+mySchema.Dimensions(4).Length = 1;
+
+if isfield(dr_struct,'z');
+  lz = length(getfield(dr_struct,'z'));
+else
+  lz = 0;
+end  
+mySchema.Dimensions(5).Name   = 'z';
+mySchema.Dimensions(5).Length = lz;
+
+if isfield(dr_struct,'tim');
+  ltim = length(getfield(dr_struct,'tim'));
+else
+  ltim = 0;
+end  
+mySchema.Dimensions(6).Name   = 'tim';
+mySchema.Dimensions(6).Length = ltim;
+
+if isfield(dr_struct,'zbot');
+  lbot = length(getfield(dr_struct,'zbot'));
+else
+  lbot = 0;
+end
+mySchema.Dimensions(7).Name   = 'zbot';
+mySchema.Dimensions(7).Length = lbot;
+
+if isfield(dr_struct,'z_sadcp');
+  lsadcp = length(getfield(dr_struct,'z_sadcp'));
+else
+  lsadcp = 0;
+end
+mySchema.Dimensions(8).Name   = 'z_sadcp';
+mySchema.Dimensions(8).Length = lsadcp;
+
+%--------------------------------------------------------------------------
+%Add first 4 variables definitions(name, date, lat, lon) to Variable field
+%--------------------------------------------------------------------------
+
+mySchema.Variables(1).Name = 'name';
+mySchema.Variables(1).Dimensions(1) = mySchema.Dimensions(1);
+mySchema.Variables(1).Datatype = 'char';
+mySchema.Variables(2).Name = 'date';
+mySchema.Variables(2).Dimensions(1) = mySchema.Dimensions(2);
+mySchema.Variables(2).Datatype = 'int32';
+mySchema.Variables(3).Name = 'lat';
+mySchema.Variables(3).Dimensions(1) = mySchema.Dimensions(3);
+mySchema.Variables(3).Datatype = 'single';
+mySchema.Variables(4).Name = 'lon';
+mySchema.Variables(4).Dimensions(1) = mySchema.Dimensions(4);
+mySchema.Variables(4).Datatype = 'single';
+
+dr_struct = orderfields(dr_struct) ; %sort dr_struct by fieldnames
+
+fnames = fieldnames(dr_struct);
+% find name, date, lat, lon in fnames that have already been added to the 
+% NetCDF file and remove from fnames
+nn=strncmp('name',fnames,6);   
+nda=strncmp('date',fnames,4);
+nla=strncmp('lat',fnames,3); 	
+nlo=strncmp('lon',fnames,3);
+ntot=[nn+nda+nla+nlo]; Ktot = logical(ntot);
+fnames(Ktot,:)=[];	
+
+%--------------------------------------------------------------------------
+%Add the remaining variables definitions from dr_struct to Variable field
+%--------------------------------------------------------------------------
+
+for n=1:size(fnames,1)
+    dummy = getfield(dr_struct,fnames{n});
+    mySchema.Variables(4+n).Name = fnames{n};
+    if ~isempty(strfind(fnames{n},'bot'))
+        mySchema.Variables(4+n).Dimensions(1) = mySchema.Dimensions(7);
+    elseif ~isempty(strfind(fnames{n},'sadcp'))
+        mySchema.Variables(4+n).Dimensions(1) = mySchema.Dimensions(8);
+    elseif ~isempty(strfind(fnames{n},'tim')) ||  ~isempty(strfind(fnames{n},'ship')) ...
+        || ~isempty(strfind(fnames{n},'ctd')) && isempty(strmatch('ctd_t',fnames{n},'exact')) ...
+        && isempty(strmatch('ctd_s',fnames{n}))
+        mySchema.Variables(4+n).Dimensions(1) = mySchema.Dimensions(6);
+    elseif ~isempty(strfind(fnames{n},'vel')) ||  ~isempty(strfind(fnames{n},'shear')) ...
+        || ~isempty(strfind(fnames{n},'ctd_')) || ~isempty(strfind(fnames{n},'uerr')) ...
+        ||  ~isempty(strfind(fnames{n},'range'))  || ~isempty(strfind(fnames{n},'ts')) ...
+        || ~isempty(strmatch('p',fnames{n},'exact')) || ~isempty(strmatch('u',fnames{n},'exact')) ...
+        || ~isempty(strmatch('v',fnames{n},'exact'))|| ~isempty(strmatch('z',fnames{n},'exact')) ...
+        || ~isempty(strfind(fnames{n},'u_')) || ~isempty(strfind(fnames{n},'v_'));
+        mySchema.Variables(4+n).Dimensions(1) = mySchema.Dimensions(5);
+    else
+        mySchema.Variables(4+n).Dimensions.Name = fnames{n};
+        mySchema.Variables(4+n).Dimensions.Length = length(dummy);
+    end 
+    if strncmp(fnames{n},'tim',4)==1 ||  ~isempty(strfind(fnames{n},'vbar')) ||  ~isempty(strfind(fnames{n},'ubar'))
+        mySchema.Variables(4+n).Datatype = 'double';
+    elseif strncmp(fnames{n},'nvel',4)==1 
+        mySchema.Variables(4+n).Datatype = 'int16';
+    else
+        mySchema.Variables(4+n).Datatype = 'single'; 
+    end   
+%    disp(sprintf('%d: %s %d',n,mySchema.Variables(4+n).Dimensions.Name,mySchema.Variables(4+n).Dimensions.Length));
+end
+
+%--------------------------------------------------------------------------
+%Add the attributes definitions from dr_struct to the Variable field
+%--------------------------------------------------------------------------
+
+ncwriteschema(fname, mySchema);
+ncwriteatt(fname,'name','long_name',att.name.long_name);
+ncwriteatt(fname,'date','long_name',att.date.long_name);
+ncwriteatt(fname,'date','units',att.date.units);
+ncwriteatt(fname,'lat','long_name',att.lat.long_name);
+ncwriteatt(fname,'lat','units',att.lat.units);
+ncwriteatt(fname,'lon','long_name',att.lon.long_name);
+ncwriteatt(fname,'lon','units',att.lon.units);
+ncwrite(fname,'name',dr_struct.name);
+ncwrite(fname,'date',dr_struct.date);
+ncwrite(fname,'lat',dr_struct.lat);
+ncwrite(fname,'lon',dr_struct.lon);
+
+for n=1:size(fnames,1)
+  dummy = getfield(dr_struct,fnames{n});
+    ncwrite(fname,fnames{n},dummy);
+    if isfield(att,fnames{n});
+        ncwriteatt(fname,fnames{n},'long_name',att.(fnames{n}).long_name);
+        if isfield(att.(fnames{n}),'units');
+             ncwriteatt(fname,fnames{n},'units',att.(fnames{n}).units);
+        end
     end
-end   
+end
 
-function [] = add_dr_struct(ncf,snm,dr,att)
+%--------------------------------------------------------------------------
+%Add the attributes definitions from da, p, f, ps mat structures to
+%Attributes field using subroutine add_struct
+%--------------------------------------------------------------------------
 
-    % scalars & misc dims
-    nccreate(ncf,'dr.name','Datatype','char','Dimensions',{'dr.name' length(dr.name)});
-	ncwrite(ncf,'dr.name',dr.name,[1]);
-	addatts(ncf,'name',att);
-    nccreate(ncf,'dr.date','Datatype','int32','Dimensions',{'dr.date' length(dr.date)});
-	ncwrite(ncf,'dr.date',dr.date,[1]);
-	addatts(ncf,'date',att);
-    nccreate(ncf,'dr.lat','Datatype','double');
-    	ncwrite(ncf,'dr.lat',dr.lat);
-    	addatts(ncf,'lat',att);
-    nccreate(ncf,'dr.lon','Datatype','double');
-    	ncwrite(ncf,'dr.lon',dr.lon);
-    	addatts(ncf,'lon',att);
-    nccreate(ncf,'dr.ubar','Datatype','double');
-    	ncwrite(ncf,'dr.ubar',dr.ubar);
-    	addatts(ncf,'ubar',att);
-    nccreate(ncf,'dr.vbar','Datatype','double');
-    	ncwrite(ncf,'dr.vbar',dr.vbar);
-    	addatts(ncf,'vbar',att);
+% remove duplicate fields from mat structures
+ps = rmfield(ps,'outlier');
+p = rmfield(p,'checkpoints');
+f = rmfield(f,'ctd_time_base');
+f = rmfield(f,'nav_time_base');
 
-    % zbot dim
-    nccreate(ncf,'dr.zbot','Datatype','double','Dimensions',{'zbot' length(dr.zbot)});
-	ncwrite(ncf,'dr.zbot',dr.zbot,[1]);
-    	addatts(ncf,'zbot',att);
-    nccreate(ncf,'dr.ubot','Datatype','double','Dimensions',{'zbot'});
-	ncwrite(ncf,'dr.ubot',dr.ubot,[1]);
-    	addatts(ncf,'ubot',att);
-    nccreate(ncf,'dr.vbot','Datatype','double','Dimensions',{'zbot'});
-	ncwrite(ncf,'dr.vbot',dr.vbot,[1]);
-    	addatts(ncf,'vbot',att);
-    nccreate(ncf,'dr.uerrbot','Datatype','double','Dimensions',{'zbot'});
-	ncwrite(ncf,'dr.uerrbot',dr.uerrbot,[1]);
-    	addatts(ncf,'uerrbot',att);
+% combine all mat structures and sort fieldnames
+names = [fieldnames(da); fieldnames(p)];
+struct1 = cell2struct([struct2cell(da); struct2cell(p)], names, 1);
+names = [fieldnames(struct1); fieldnames(ps)];
+struct2 = cell2struct([struct2cell(struct1); struct2cell(ps)], names, 1);
+names = [fieldnames(struct2); fieldnames(f)];
+struct3 = cell2struct([struct2cell(struct2); struct2cell(f)], names, 1);
+structsorted = orderfields(struct3) ;
 
-    % z_sadcp dim
-    nccreate(ncf,'dr.z_sadcp','Datatype','double','Dimensions',{'z_sadcp' length(dr.z_sadcp)});
-	ncwrite(ncf,'dr.z_sadcp',dr.z_sadcp,[1]);
-    	addatts(ncf,'z_sadcp',att);
-    nccreate(ncf,'dr.u_sadcp','Datatype','double','Dimensions',{'z_sadcp'});
-	ncwrite(ncf,'dr.u_sadcp',dr.u_sadcp,[1]);
-    	addatts(ncf,'u_sadcp',att);
-    nccreate(ncf,'dr.v_sadcp','Datatype','double','Dimensions',{'z_sadcp'});
-	ncwrite(ncf,'dr.v_sadcp',dr.v_sadcp,[1]);
-    	addatts(ncf,'v_sadcp',att);
-    nccreate(ncf,'dr.uerr_sadcp','Datatype','double','Dimensions',{'z_sadcp'});
-	ncwrite(ncf,'dr.uerr_sadcp',dr.uerr_sadcp,[1]);
-    	addatts(ncf,'uerr_sadcp',att);
+% add attributes to netcdf from the p, ps, da and f structures
+% the slash indicates a global variable, if you change it the value in the 
+% structures will be placed in the Variables field of the netcdf 
+add_struct(fname,'/',structsorted); 
 
-    % z dim
-    nccreate(ncf,'dr.z','Datatype','double','Dimensions',{'z' length(dr.z)});
-	ncwrite(ncf,'dr.z',dr.z,[1]);
-    	addatts(ncf,'z',att);
-    nccreate(ncf,'dr.u','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.u',dr.u,[1]);
-    	addatts(ncf,'u',att);
-    nccreate(ncf,'dr.v','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.v',dr.v,[1]);
-    	addatts(ncf,'v',att);
-    nccreate(ncf,'dr.nvel','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.nvel',dr.nvel,[1]);
-    	addatts(ncf,'nvel',att);
-    nccreate(ncf,'dr.uerr','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.uerr',dr.uerr,[1]);
-    	addatts(ncf,'uerr',att);
-    nccreate(ncf,'dr.range','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.range',dr.range,[1]);
-    	addatts(ncf,'range',att);
-    nccreate(ncf,'dr.range_do','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.range_do',dr.range_do,[1]);
-    	addatts(ncf,'range_do',att);
-    nccreate(ncf,'dr.range_up','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.range_up',dr.range_up,[1]);
-    	addatts(ncf,'range_up',att);
-    nccreate(ncf,'dr.ts','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.ts',dr.ts,[1]);
-    	addatts(ncf,'ts',att);
-    nccreate(ncf,'dr.ts_out','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.ts_out',dr.ts_out,[1]);
-    	addatts(ncf,'ts_out',att);
-    nccreate(ncf,'dr.p','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.p',dr.p,[1]);
-    	addatts(ncf,'p',att);
-    nccreate(ncf,'dr.ctd_t','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.ctd_t',dr.ctd_t,[1]);
-    	addatts(ncf,'ctd_t',att);
-    nccreate(ncf,'dr.ctd_s','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.ctd_s',dr.ctd_s,[1]);
-    	addatts(ncf,'ctd_s',att);
-    nccreate(ncf,'dr.u_do','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.u_do',dr.u_do,[1]);
-    	addatts(ncf,'u_do',att);
-    nccreate(ncf,'dr.v_do','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.v_do',dr.v_do,[1]);
-    	addatts(ncf,'v_do',att);
-    nccreate(ncf,'dr.u_up','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.u_up',dr.u_up,[1]);
-    	addatts(ncf,'u_up',att);
-    nccreate(ncf,'dr.v_up','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.v_up',dr.v_up,[1]);
-    	addatts(ncf,'v_up',att);
-    nccreate(ncf,'dr.ensemble_vel_err','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.ensemble_vel_err',dr.ensemble_vel_err,[1]);
-    	addatts(ncf,'ensemble_vel_err',att);
-    nccreate(ncf,'dr.u_shear_method','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.u_shear_method',dr.u_shear_method,[1]);
-    	addatts(ncf,'u_shear_method',att);
-    nccreate(ncf,'dr.v_shear_method','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.v_shear_method',dr.v_shear_method,[1]);
-    	addatts(ncf,'v_shear_method',att);
-    nccreate(ncf,'dr.w_shear_method','Datatype','double','Dimensions',{'z'});
-	ncwrite(ncf,'dr.w_shear_method',dr.w_shear_method,[1]);
-    if existf(dr,'ctd_ss')
-	nccreate(ncf,'dr.ctd_ss','Datatype','double','Dimensions',{'z'});
-	    ncwrite(ncf,'dr.ctd_ss',dr.ctd_ss,[1]);
-	    addatts(ncf,'ctd_ss',att);
-    end
-    if existf(dr,'ctd_N2')
-	nccreate(ncf,'dr.ctd_N2','Datatype','double','Dimensions',{'z'});
-	    ncwrite(ncf,'dr.ctd_N2',dr.ctd_N2,[1]);
-	    addatts(ncf,'ctd_N2',att);
-    end
-
-    % tim dim
-    nccreate(ncf,'dr.tim','Datatype','double','Dimensions',{'tim' length(dr.tim)});
-	ncwrite(ncf,'dr.tim',dr.tim,[1]);
-    	addatts(ncf,'tim',att);
-    nccreate(ncf,'dr.tim_hour','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.tim_hour',dr.tim_hour,[1]);
-    	addatts(ncf,'tim_hour',att);
-    nccreate(ncf,'dr.shiplon','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.shiplon',dr.shiplon,[1]);
-    	addatts(ncf,'shiplon',att);
-    nccreate(ncf,'dr.shiplat','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.shiplat',dr.shiplat,[1]);
-    	addatts(ncf,'shiplat',att);
-    nccreate(ncf,'dr.xship','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.xship',dr.xship,[1]);
-    	addatts(ncf,'xship',att);
-    nccreate(ncf,'dr.yship','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.yship',dr.yship,[1]);
-    	addatts(ncf,'yship',att);
-    nccreate(ncf,'dr.uship','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.uship',dr.uship,[1]);
-    	addatts(ncf,'uship',att);
-    nccreate(ncf,'dr.vship','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.vship',dr.vship,[1]);
-    	addatts(ncf,'vship',att);
-    nccreate(ncf,'dr.zctd','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.zctd',dr.zctd,[1]);
-    	addatts(ncf,'zctd',att);
-    nccreate(ncf,'dr.wctd','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.wctd',dr.wctd,[1]);
-    	addatts(ncf,'wctd',att);
-    nccreate(ncf,'dr.uctd','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.uctd',dr.uctd,[1]);
-    	addatts(ncf,'uctd',att);
-    nccreate(ncf,'dr.vctd','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.vctd',dr.vctd,[1]);
-    	addatts(ncf,'vctd',att);
-    nccreate(ncf,'dr.xctd','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.xctd',dr.xctd,[1]);
-    	addatts(ncf,'xctd',att);
-    nccreate(ncf,'dr.yctd','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.yctd',dr.yctd,[1]);
-    	addatts(ncf,'yctd',att);
-    nccreate(ncf,'dr.uctderr','Datatype','double','Dimensions',{'tim'});
-	ncwrite(ncf,'dr.uctderr',dr.uctderr,[1]);
-    	addatts(ncf,'uctderr',att);
 end % function
 
 %----------------------------------------------------------------------
-
-function [] = add_struct(ncf,snm,struct)
-
-    fname = fieldnames(struct);
-    for i=1:length(fname)
-	fns = char(fname(i));
-	vnm = sprintf('%s.%s',snm,fns);
-    
-	f = getfield(struct,fns);
-	if isstruct(f)
-	    error(sprintf('ladcp2cdf:add_struct(%s) substructures are not allowed',vnm));
-	end
-    
-	if ischar(f),		type = 'char';					% define data type
-	elseif isnumeric(f),	type = 'double';
-	elseif islogical(f),	type = 'int8'; if f, f=1; else, f=0; end;	% logical -> int
-	else, error(sprintf('ladcp2cdf:create_var(%s) unsupported type',vnm));
-	end
-
-	[nr nc] = size(f);							% define variable
-	if (nr*nc < 2)								% scalar
-	    nccreate(ncf,vnm,'Datatype',type);
-	elseif (nr==1 || nc==1) 						% vector
-	    nccreate(ncf,vnm,'Datatype',type,'Dimensions',{vnm nr*nc});
-	else									% matrix
-	    nccreate(ncf,vnm,'Datatype',type,'Dimensions',{sprintf('%s_c',vnm) nc sprintf('%s_r',vnm) nr});
-	end
-
-	if (nr*nc == 1) 							% write data: scalar
-	    %disp(sprintf('Writing one %s value to %s...',type,vnm));
-	    ncwrite(ncf,vnm,f);
-	elseif (nr==1 || nc==1) 						% vector
-	    %disp(sprintf('Writing %d %s values to %s...',nr*nc,type,vnm));
-	    ncwrite(ncf,vnm,f,[1]);
-	elseif (nr*nc > 1)							% matrix
-	    %disp(sprintf('Writing %dx%d %s values to %s...',nr,nc,type,vnm));
-	    ncwrite(ncf,vnm,f',[1 1]);
-        end % if
-    end % for
-end % function
-
-
-
