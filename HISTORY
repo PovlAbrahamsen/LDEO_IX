@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Fri Nov 27 17:39:30 2015
+                    dlm: Thu Feb 18 11:03:26 2016
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 284 30 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 290 0 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -283,3 +283,7 @@ IX_11:
 		- BUG in [ladcp2cdf.m]
 		- commit version IX_11		
 
+IX_12:
+	Feb 18, 2016:
+		- updated version to IX_12 in [default.m] [.hg/hgrc]
+		- bug fix (geomag year range check) in [loadnav.m]

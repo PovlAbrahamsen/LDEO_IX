@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D N A V . M 
 %                    doc: Thu Jun 17 18:01:50 2004
-%                    dlm: Mon Jan  3 02:01:17 2011
+%                    dlm: Thu Feb 18 11:03:13 2016
 %                    (c) 2004 ladcp@
-%                    uE-Info: 252 25 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 37 63 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
@@ -34,6 +34,7 @@
 %   Dec  1, 2009: - BUG: geomag date check was wrong (Dec 1 2009 resulted in a date >= 2010)
 %   Jan 22, 2010: - adapted to Eric Firing's much simplified magdec utility
 %   Jan  3, 2011: - changed IGRF11 validity to end of 2015 (from 2010)
+%   Feb 18, 2016: - BUG: geomag year range check bombed in 2016
 
 function [d,p]=loadnav(f,d,p)
 % function [d,p]=loadnav(f,d,p)
@@ -249,7 +250,7 @@ function  dev=geomag(f,date,lat,lon);
 
 dstr = gregoria(date);					% convert date (approx)
 year = dstr(1); month = dstr(2); day = dstr(3);
-if (year < 1900 || year > 2015)
+ if (year < 1980 || year > 2031)
 	error(sprintf('year = %d out of range',year));
 end
 							% execute external program
