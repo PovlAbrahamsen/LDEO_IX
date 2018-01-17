@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D N A V . M 
 %                    doc: Thu Jun 17 18:01:50 2004
-%                    dlm: Thu Feb 18 11:03:13 2016
+%                    dlm: Thu Feb 18 13:38:50 2016
 %                    (c) 2004 ladcp@
-%                    uE-Info: 37 63 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 182 7 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
@@ -35,6 +35,7 @@
 %   Jan 22, 2010: - adapted to Eric Firing's much simplified magdec utility
 %   Jan  3, 2011: - changed IGRF11 validity to end of 2015 (from 2010)
 %   Feb 18, 2016: - BUG: geomag year range check bombed in 2016
+%		  - added p.interp_missing_GPS using code provided by Jay Hooper
 
 function [d,p]=loadnav(f,d,p)
 % function [d,p]=loadnav(f,d,p)
@@ -51,6 +52,10 @@ p = setdefv(p,'navtime_av',2/60/24);
 
 % INTERPOLATE IRREGULAR NAV TIME SERIES (Dan Torres)
 p=setdefv(p,'interp_nav_times',0);
+
+% INTERPOLATE MISSING GPS VALUES (Jay Hooper)
+p=setdefv(p,'interp_missing_GPS',1);
+
 
 % FILE LAYOUT
 f = setdefv(f,'nav_header_lines',0);
@@ -158,6 +163,24 @@ end
 p.navdata = 1;
 d.slat = data(:,1);
 d.slon = data(:,2);
+
+%----------------------------------------
+% interpolate missign GPS values
+%	code provided by Jay Hooper
+%----------------------------------------
+
+if p.interp_missing_GPS
+    bad_lon = find(d.slon == -9.990e-29);
+    if ~isempty(bad_lon),
+	good_lon = find(d.slon ~= -9.990e-29);
+	d.slon = interp1(d.navtime_jul(good_lon),d.slon(good_lon),d.navtime_jul);
+    end
+    bad_lat = find(d.slat == -9.990e-29);
+    if ~isempty(bad_lat),
+	good_lat = find(d.slat ~= -9.990e-29);
+	d.slat = interp1(d.navtime_jul(good_lat),d.slat(good_lat),d.navtime_jul);
+    end
+end
 
 % =================================================================
 % - at this point nav data is in d.navtime_jul, d.slon, d.slat

@@ -8,9 +8,9 @@ function [] = mkSADCP(CODAS_CONTOUR_DIR,SADCP_OUTPUT_FILE)
 %======================================================================
 %                    M K S A D C P . M 
 %                    doc: Mon Mar 15 06:00:43 2004
-%                    dlm: Fri Jan  5 15:06:38 2007
+%                    dlm: Fri Jan  6 12:28:45 2017
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 63 33 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 31 61 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 %
 % pre-processing script to get UH/CODAS-processed SADCP data (usually
@@ -28,6 +28,7 @@ function [] = mkSADCP(CODAS_CONTOUR_DIR,SADCP_OUTPUT_FILE)
 % HISTORY:
 %  Mar 15, 2004: - created
 %  Jan  5, 2007: - documented and added to IX_4 distribution
+%  Jan  6, 2016: - added time of first SADCP record to output
 
 %======================================================================
 
@@ -56,6 +57,8 @@ lon_sadcp(ii)=lon_sadcp(ii)+360;
 z_sadcp   = z_sadcp(:);
 tim_sadcp = tim_sadcp(:);
 
+disp(sprintf('first SADCP processing date %d-%d-%d %d:%d:%d',...
+	gregoria(tim_sadcp(1))));
 disp(sprintf(' last SADCP processing date %d-%d-%d %d:%d:%d',...
 	gregoria(tim_sadcp(end))));
 disp([' Time is now: ',datestr(now)])

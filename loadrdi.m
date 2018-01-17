@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Wed May 27 08:17:42 2015
+%                    dlm: Tue Feb 23 16:44:19 2016
 %                    (c) 2004 ladcp@
-%                    uE-Info: 51 41 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 52 52 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -49,6 +49,7 @@ function [d,p,de]=loadrdi(f,p)
 %  Jan 23, 2015: - made updown() bomb when UL file is not found
 %  Apr 15, 2015: - modified ambiguity-velocity warning as suggested by Diana Cardoso
 %  May 27, 2015: - clarified time-related warnings
+%  Feb 23, 2016: - clarified header id error message
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -1251,7 +1252,7 @@ if  (n < 2 | feof(fid))
   error('Unexpected end of file.')
 end
 if (id(1) ~= hid | id(2) ~= sid)
-  error('Header identification byte not found.')
+  error(sprintf('Header identification byte not found (%02x %02x).',id(1),id(2)))
 end
 
 % read the number of bytes

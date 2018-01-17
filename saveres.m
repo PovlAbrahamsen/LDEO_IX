@@ -1,24 +1,25 @@
 %======================================================================
 %                    S A V E R E S . M 
 %                    doc: Fri Sep 26 15:55:18 2014
-%                    dlm: Fri Sep 26 16:04:57 2014
+%                    dlm: Wed Mar 29 12:33:09 2017
 %                    (c) 2014 A.M. Thurnherr
-%                    uE-Info: 19 46 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 22 51 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
-function []=saveres(dr,p,ps,f,d)
-% function []=saveres(dr,p,ps,f,d)
+function []=saveres(dr,p,ps,f,d,att,da)
+% function []=saveres(dr,p,ps,f,d,att,da)
 %
 % store LADCP result in RODB format
 %
 
 % MODIFICTIONS BY ANT:
 %	Sep 26, 2014: - added support for p.orig (patch by Dan Torres)
+%	Mar 29, 2017: - added att and da as requested by UH for archiving
 
 if p.orig == 1
-	eval(['save ',[f.res,'.mat'],' dr p ps f d'])
+	eval(['save ',[f.res,'.mat'],' dr p ps f d da att'])
 else
-	eval(['save ',[f.res,'.mat'],' dr p ps f'])
+	eval(['save ',[f.res,'.mat'],' dr p ps f da att'])
 end
 
 % version 0.1	last change 28.6.2000

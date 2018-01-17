@@ -1,9 +1,9 @@
 %======================================================================
 %                    F I X C O M P A S S . M 
 %                    doc: Fri Dec 30 14:59:27 2011
-%                    dlm: Sat Dec 31 12:32:47 2011
+%                    dlm: Sun Mar  6 12:15:39 2016
 %                    (c) 2011 A.M. Thurnherr
-%                    uE-Info: 31 92 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 42 0 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 function [d,p]=fixcompass(d,p)
@@ -29,14 +29,17 @@ function [d,p]=fixcompass(d,p)
 %	Dec 30, 2011: - BUG: p.fix_compass = 2 and = 3 did not work; bug report and fix 
 %						 provided by Roman Tarakanov <rtarakanov@gmail.com> today
 %						 bug fix verified with PALE data (old code produces garbage results)
+%	Mar  6, 2016: - BUG: p.fix_compass = 1 did not work for single-head profiles
 
 disp('FIXCOMPASS adjust compass')
 
 % use tilt sensors to figure out allingment between instruments
-diary off
-  hoff2=fminsearch('checktilt',0,[],[d.rol(2,:);d.pit(2,:);d.rol(1,:);d.pit(1,:)]);
-diary on
-disp([' mean instrument alignment based on tilt is ',num2str(hoff2),' deg'])
+if p.fix_compass > 1
+	diary off
+	  hoff2=fminsearch('checktilt',0,[],[d.rol(2,:);d.pit(2,:);d.rol(1,:);d.pit(1,:)]);
+	diary on
+    disp([' mean instrument alignment based on tilt is ',num2str(hoff2),' deg'])
+end
 
 [lb,lt]=size(d.ru);
 if p.fix_compass==2

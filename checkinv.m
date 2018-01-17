@@ -1,3 +1,14 @@
+%======================================================================
+%                    C H E C K I N V . M 
+%                    doc: Tue Jun 13 14:29:15 2017
+%                    dlm: Tue Jun 13 14:33:27 2017
+%                    (c) 2017 A.M. Thurnherr
+%                    uE-Info: 10 77 NIL 0 0 72 0 2 4 NIL ofnI
+%======================================================================
+
+% CHANGES BY ANT:
+%	Jun 13, 2017: Matlab incompatibility (legend had extraneous -1 final arg)
+
 function p=checkinv(dr,di,de,der,p,ps)
 % function p=checkinv(dr,di,de,der,p,ps)
 % check inversion for consistency 
@@ -84,7 +95,8 @@ if existf(de,'type_constraints')
  
  subplot(211)
  bar(dr.z,de.ocean_constraints(ic,:)','stack') 
- legend(de.type_constraints(ic,:),-1)
+% legend(de.type_constraints(ic,:),-1)
+ legend(de.type_constraints(ic,:))
  ylabel('sum of weights')
  title('ocean velocity constraints')
  xlabel('depth [m]')
@@ -92,7 +104,8 @@ if existf(de,'type_constraints')
 
  subplot(212)
  bar(de.ctd_constraints(ic,:)','stack') 
- legend(de.type_constraints(ic,:),-1)
+% legend(de.type_constraints(ic,:),-1)
+ legend(de.type_constraints(ic,:))
  title('CTD velocity constraints')
  ylabel('sum of weights')
  xlabel('super ensemble')

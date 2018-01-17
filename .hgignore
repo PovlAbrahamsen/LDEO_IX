@@ -1,9 +1,9 @@
 #======================================================================
 #                    . H G I G N O R E 
 #                    doc: Tue Oct 20 16:22:40 2009
-#                    dlm: Wed Nov 25 14:15:17 2015
+#                    dlm: Wed Jan 17 12:07:30 2018
 #                    (c) 2009 A.M. Thurnherr
-#                    uE-Info: 16 7 NIL 0 0 72 0 2 4 NIL ofnI
+#                    uE-Info: 18 8 NIL 0 0 72 0 2 4 NIL ofnI
 #======================================================================
 
 syntax: glob
@@ -14,3 +14,5 @@ HowTo
 .hg-disabled
 ladcp2cdf
 Private
+LDEO_IX_Software.tgz
+Makefile

@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Thu Feb 18 11:03:26 2016
+                    dlm: Wed Jan 17 12:19:26 2018
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 290 0 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 325 17 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -287,3 +287,40 @@ IX_12:
 	Feb 18, 2016:
 		- updated version to IX_12 in [default.m] [.hg/hgrc]
 		- bug fix (geomag year range check) in [loadnav.m]
+		- commit
+		- publish
+
+IX_13:
+	Feb 18, 2016: 
+		- updated version to IX_13beta in [default.m] [.hg/hgrc]
+		- incorporated GPS interpolation code provided by Jay Hooper
+		  into [loadnav.m]
+	Feb 23, 2016:
+		- improved error message in [loadrdi.m]
+	Feb 29, 2016:
+		- added station number to log-file processing-step headers		
+	Mar  2, 2016:
+		- BUG: [fixcompass.m] did not work for single-headed profiles
+	Apr  1, 2016:
+		- cosmetics in [prepinv.m]		
+	Jul 27, 2016:
+		- added .mat to checkpoint filename to allow more complect file names
+	Sep  1, 2016:
+		- BUG in [uvwrot.m]: diagnostic message displayed only pitch
+	Oct 14, 2016:
+		- BUG in [process_cast.m]: ctd_t, ctd_s were set after first pass,
+		  sometimes causing inconsistent vector lengths
+	Jan  6, 2017:
+		- improvement to [mkSADCP.m]
+	Mar 29, 2017:
+		- added archive structs to .mat output [process_cast.m] [saveres.m]
+		- added saveplot_pdf to [default.m]
+	Jun 13, 2017:
+		- BUG: Matlab incompatibility in [checkinv.m]
+	Dec  7, 2017:
+		- fixed bug in [geterr.m] for P6 cruise
+	Jan 17, 2018:
+		- updated version to IX_13 in [default.m] [.hg/hgrc]
+		- commit
+		- publish
+		

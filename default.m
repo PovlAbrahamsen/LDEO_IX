@@ -1,9 +1,9 @@
 %======================================================================
 %                    D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Thu Feb 18 11:01:28 2016
+%                    dlm: Wed Jan 17 12:19:09 2018
 %                    (c) 2004 ladcp@
-%                    uE-Info: 37 46 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 40 0 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -18,7 +18,10 @@
 %	Mar 21, 2014  - updated version to IX_11beta
 %	Jun 11, 2014: - changed savecdf default to 0
 %	Nov 25, 2015: - changed version to IX_11
-%	Feb 18, 2016: - changed version to IX_12
+%	Feb 18, 2016: - changed version to IX_12 and published
+%				  - changed version to IX_13beta
+%	Mar 29, 2017: - added saveplot_pdf
+%	Jan 17, 2018: - changed ersion to IX_13 and published
 
 % LADCP processing software
 % M. Visbeck. LDEO/2003
@@ -34,7 +37,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_12';
+p.software='LDEO LADCP software: Version IX_13';
 
 % file names
 % f.ladcpdo  is the ONLY required input
@@ -345,11 +348,11 @@ p=setdefv(p,'zpar',[0 NaN 0]);
 %   11 : Processing Warnings
 %   12 : Inversion Constraints
 %   13 : Bottom Track detail
+%	14 : Echo Amplitude (data editing)
 
-  p = setdefv(p,'saveplot',1);
-
-% which plots to also save in png format
-  p = setdefv(p,'saveplot_png',1);
+p = setdefv(p,'saveplot',1);
+p = setdefv(p,'saveplot_png',[]);
+p = setdefv(p,'saveplot_pdf',[]);
   
 %--------------------------------------------------------------
 % Parameter for inversion   ps.* structure

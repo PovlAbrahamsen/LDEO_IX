@@ -1,9 +1,9 @@
 %======================================================================
 %                    P R E P I N V . M 
 %                    doc: Wed Jan  7 16:46:29 2009
-%                    dlm: Mon Jun  9 17:03:32 2014
+%                    dlm: Fri Apr  1 08:52:25 2016
 %                    (c) 2009 A.M. Thurnherr
-%                    uE-Info: 677 74 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 17 29 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -14,6 +14,7 @@
 %   		  - BUG: down/upcast separation bombed wen no CTD data were
 %			 available
 %   Jun  9, 2014: - improved messages
+%   Apr  1, 2016: - cosmetics
 
 function [di,p,d]=prepinv(d,p,dr)
 % function [di,p,d]=prepinv(d,p,dr)
@@ -339,7 +340,7 @@ if (p.rotup2down~=0 & length(d.zd)~=length(d.ru(:,1)))
    disp(' rot up2down use mean up/down compass')
   elseif p.rotup2down==2
    hrot=hrotvel;
-   disp(' rot up2down use velocties')
+   disp(' rot up2down use velocities')
   elseif p.rotup2down==3
    hrot=hrotcomp;
    disp(' rot up2down use down compass')

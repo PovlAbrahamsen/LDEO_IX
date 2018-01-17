@@ -1,3 +1,14 @@
+%======================================================================
+%                    U V W R O T . M 
+%                    doc: Thu Sep  1 15:33:28 2016
+%                    dlm: Thu Sep  1 15:34:11 2016
+%                    (c) 2016 A.M. Thurnherr
+%                    uE-Info: 10 64 NIL 0 0 72 0 2 4 NIL ofnI
+%======================================================================
+
+% CHANGES BY ANT:
+%	Sep  1, 2016: - BUG: diagnostic message displayed only pitch
+
 function [d,p]=uvwrot(d,p,iup)
 % function [d,p]=uvwrot(d,p,iup)
 % rotate velocities by p.drot p.dpit p.drol
@@ -20,13 +31,13 @@ else
   iz=d.izu;
   it=2;
   disp(' up-looking data pitch-roll offset')
-  disp([' pitch: ',num2str(p.dpit),' roll: ',num2str(p.dpit)])
+  disp([' pitch: ',num2str(p.dpit),' roll: ',num2str(p.drol)])
  else
  % down looking only
   iz=d.izd;
   it=1;
   disp(' down-looking data pitch-roll offset')
-  disp([' pitch: ',num2str(p.dpit),' roll: ',num2str(p.dpit)])
+  disp([' pitch: ',num2str(p.dpit),' roll: ',num2str(p.drol)])
  end
 end
 

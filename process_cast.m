@@ -40,9 +40,9 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %======================================================================
 %                    P R O C E S S _ C A S T . M 
 %                    doc: Thu Jun 24 16:54:23 2004
-%                    dlm: Tue May 12 08:36:53 2015
+%                    dlm: Wed Mar 29 12:57:24 2017
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 378 0 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 90 39 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % NOTES:
@@ -81,6 +81,13 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %  Apr 26, 2012: - finally removed finestructure kz code
 %  Sep 26, 2014: - added support for p.orig in [saveres.m] (patch by Dan Torres)
 %  May 12, 2015: - finally removed entire step 16 (diffusivity)
+%  Jul 27, 2016: - added explicit .mat to checkpoints file to allow more
+%		   complex filenames
+%  Oct 14, 2016: - BUG: ctd_t, ctd_s were set after first pass, sometimes
+%			causing inconsistent vector lengths
+%  Mar 29, 2017: - added att and da to saveres
+%	 	 - added saveplot_pdf
+%		 - made fignums 2-digit
 
 %----------------------------------------------------------------------
 % STEP 0: EXECUTE ALWAYS
@@ -122,7 +129,7 @@ disp(p.software);			% show version
 if length(f.checkpoints) <= 1		% setup checkpointing
  error('Need to set f.checkpoints to write checkpoint files');
 end
-eval(sprintf('save %s_0 stn',f.checkpoints)); % sentinel
+eval(sprintf('save %s_0.mat stn',f.checkpoints)); % sentinel
 
 last_checkpoint = pcs.begin_step - 1;	% find last valid checkpoint
 while ~exist(sprintf('%s_%d.mat',f.checkpoints,last_checkpoint),'file')
@@ -368,13 +375,6 @@ if pcs.begin_step <= pcs.cur_step
      dino=di;
      lanarrow
      diary on
-     if existf(d,'ctdprof_p')
-       dr.ctd_t=interp1q(d.ctdprof_z,d.ctdprof_t,dr.z);
-       dr.ctd_s=interp1q(d.ctdprof_z,d.ctdprof_s,dr.z);
-     end
-     if existf(d,'ctdprof_ss')
-       dr.ctd_ss=interp1q(d.ctdprof_z,d.ctdprof_ss,dr.z);
-     end
   end
 
   end_processing_step;
@@ -523,14 +523,22 @@ pcs.cur_step = pcs.cur_step + 1;
 if pcs.begin_step <= pcs.cur_step
   pcs.step_name = 'SAVE OUTPUT'; begin_processing_step;
 
+  if existf(d,'ctdprof_p')
+    dr.ctd_t=interp1q(d.ctdprof_z,d.ctdprof_t,dr.z);
+    dr.ctd_s=interp1q(d.ctdprof_z,d.ctdprof_s,dr.z);
+  end
+  if existf(d,'ctdprof_ss')
+    dr.ctd_ss=interp1q(d.ctdprof_z,d.ctdprof_ss,dr.z);
+  end
+
   if length(f.res)>1
   
     %
     % save results to ASCII, MATLAB and NETCD files
     %
     disp(' save results ')
-    saveres(dr,p,ps,f,d)
     da=savearch(dr,d,p,ps,f,att);
+    saveres(dr,p,ps,f,d,att,da)
   
     %
     % save plots
@@ -543,7 +551,7 @@ if pcs.begin_step <= pcs.cur_step
          ok = 1; eval(sprintf('h = get(%d);',j),'ok = 0;');
          if ok
            figure(j);
-           eval(['print -dpsc ',f.res,'_' int2str(j) '.ps ']);
+           eval(sprintf('print -dpsc %s_%02d.ps',f.res,j))
          end
        end
     end
@@ -553,7 +561,17 @@ if pcs.begin_step <= pcs.cur_step
          ok = 1; eval(sprintf('h = get(%d);',j),'ok = 0;');
          if ok
            figure(j)
-           eval(['print -dpng ',f.res,'_' int2str(j) '.png '])
+           eval(sprintf('print -dpng %s_%02d.png',f.res,j))
+         end
+       end
+    end
+    for i = 1:length(p.saveplot_pdf)
+       j = p.saveplot_pdf(i);
+       if any(ismember(j,pcs.update_figures))
+         ok = 1; eval(sprintf('h = get(%d);',j),'ok = 0;');
+         if ok
+           figure(j)
+           eval(sprintf('print -dpdf %s_%02d.pdf',f.res,j))
          end
        end
     end

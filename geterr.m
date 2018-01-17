@@ -1,9 +1,9 @@
 %======================================================================
 %                    G E T E R R . M 
 %                    doc: Wed Jun 30 23:24:51 2004
-%                    dlm: Wed Jan 28 09:46:12 2015
+%                    dlm: Thu Dec  7 09:50:52 2017
 %                    (c) 2004 ladcp@
-%                    uE-Info: 21 42 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 23 47 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
@@ -19,6 +19,8 @@
 %  Jul  6, 2001: - fixed plot title
 %  Jan 25, 2015: - separated uc/dc in bin-averaged residual plots
 %  Jan 28, 2015: - BUG: figure legend typo
+%  Dec  7, 2017: - BUG: btmi was set to nan for P6 station 94; fixed with
+%			symptomatic work-around
 
 function l=geterr(ps,dr,d,iplot)
 % function l=geterr(dr,d,iplot)
@@ -196,7 +198,18 @@ d.rv(ii)=nan;
    orient landscape
    
 % find downcast/upcast separation
+% Dec 2017
+%	- P6 station 94 bombs because the first statement sets bmti to nan
+%	- checking the code revelaed that btmi is never used iwth l.u_ocea but, rather
+%	  with l.ru_err and l.rv_err
+%	- therefore I added the if statement as a symptomatic cop-out
+%	- the 2nd statement may be more appropriate than the first one but because
+%	  the software has worked for many years with the first statement I kept 
+%	  it like that
   btmi = fix(median(find(isfinite(l.u_oce(end,:)))));
+  if ~isfinite(btmi)
+      btmi = fix(median(find(isfinite(l.ru_err(end,:)))));
+  end
 
 % define color map
    if ps.fig3_colormap == 2
