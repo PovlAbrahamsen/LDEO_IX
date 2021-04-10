@@ -40,9 +40,9 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %======================================================================
 %                    P R O C E S S _ C A S T . M 
 %                    doc: Thu Jun 24 16:54:23 2004
-%                    dlm: Wed Mar 29 12:57:24 2017
+%                    dlm: Wed Sep  4 17:59:11 2019
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 90 39 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 467 12 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % NOTES:
@@ -88,6 +88,12 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %  Mar 29, 2017: - added att and da to saveres
 %	 	 - added saveplot_pdf
 %		 - made fignums 2-digit
+%  Sep 15, 2018: - disabled serial-number code
+%  Feb  8, 2019: - added pause before saving figures (TheThinMint requires this)
+%  Feb 16, 2019: - move cast post-processing to step 17 so that post-processing
+%		   is done before results are saved
+%  Aug 30, 2019: - changed error message about p.getdepth
+%  Sep  4, 2019: - replaced [getshear2.m] by GK's new [calc_shear3.m]
 
 %----------------------------------------------------------------------
 % STEP 0: EXECUTE ALWAYS
@@ -173,7 +179,7 @@ if pcs.begin_step <= pcs.cur_step
   [d,p]=loadrdi(f,p); 
 
   % get instrument serial number
-  p=getserial(f,p);
+  %  p=getserial(f,p);
 
   end_processing_step;
 end % OF STEP 1: LOAD DATA
@@ -291,7 +297,7 @@ if pcs.begin_step <= pcs.cur_step
   if p.getdepth==2
    [d,p]=getdpthi(d,p);
    if length(find(~isfinite(d.izm(1,:))))
-     error('Non-finite values in d.izm --- try processing with p.getdepth == 1');
+     error('Missing values in d.izm --- likely missing values in CTD file (processing with p.getdepth = 1; might work');
    end
   else
    [d,p]=getdpth(d,p);
@@ -456,9 +462,9 @@ if pcs.begin_step <= pcs.cur_step
   
   if ps.shear>0
    if ps.shear==1
-    [ds,dr,ps,p]=getshear2(d,p,ps,dr);
+    [ds,p,dr]=calc_shear3(d,p,ps,dr);		% use all data (d)
    else
-    [ds,dr,ps,p]=getshear2(di,p,ps,dr);
+    [ds,p,dr]=calc_shear3(di,p,ps,dr);		% use superensemble data (di)
    end
   end
 
@@ -531,6 +537,10 @@ if pcs.begin_step <= pcs.cur_step
     dr.ctd_ss=interp1q(d.ctdprof_z,d.ctdprof_ss,dr.z);
   end
 
+  if exist('post_process_cast','file')	% cruise-specific post-processing
+    post_process_cast;
+  end
+
   if length(f.res)>1
   
     %
@@ -550,7 +560,7 @@ if pcs.begin_step <= pcs.cur_step
          disp(sprintf('  figure %d...',j));
          ok = 1; eval(sprintf('h = get(%d);',j),'ok = 0;');
          if ok
-           figure(j);
+           figure(j); pause(1);
            eval(sprintf('print -dpsc %s_%02d.ps',f.res,j))
          end
        end
@@ -560,7 +570,7 @@ if pcs.begin_step <= pcs.cur_step
        if any(ismember(j,pcs.update_figures))
          ok = 1; eval(sprintf('h = get(%d);',j),'ok = 0;');
          if ok
-           figure(j)
+           figure(j); pause(1);
            eval(sprintf('print -dpng %s_%02d.png',f.res,j))
          end
        end
@@ -570,7 +580,7 @@ if pcs.begin_step <= pcs.cur_step
        if any(ismember(j,pcs.update_figures))
          ok = 1; eval(sprintf('h = get(%d);',j),'ok = 0;');
          if ok
-           figure(j)
+           figure(j); pause(1);
            eval(sprintf('print -dpdf %s_%02d.pdf',f.res,j))
          end
        end
@@ -591,10 +601,6 @@ end % OF STEP 17: SAVE OUTPUT
 %----------------------------------------------------------------------
 % FINAL STEP: CLEAN UP
 %----------------------------------------------------------------------
-
-if exist('post_process_cast','file')	% cruise-specific post-processing
-  post_process_cast;
-end
 
 fclose('all');				%  close all files just to make sure
 

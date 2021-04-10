@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Tue Feb 23 16:44:19 2016
+%                    dlm: Mon Jan 27 18:41:35 2020
 %                    (c) 2004 ladcp@
-%                    uE-Info: 52 52 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 54 98 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -50,6 +50,8 @@ function [d,p,de]=loadrdi(f,p)
 %  Apr 15, 2015: - modified ambiguity-velocity warning as suggested by Diana Cardoso
 %  May 27, 2015: - clarified time-related warnings
 %  Feb 23, 2016: - clarified header id error message
+%  Jan 27, 2020: - moved magdev call further back, where start time is known
+%		   (with GK's new magdev code, this howto is miraculously correct again - I think)
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -60,22 +62,6 @@ p=setdefv(p,'ts_signal_min',-5);
 p=setdefv(p,'ignore_beam',[nan nan]);
 
 if nargin<2, p.name='unknown'; end
-
-if existf(p,'poss')
- if isfinite(sum(p.poss))
-  drot=magdev(p.poss(1)+p.poss(2)/60, p.poss(3)+p.poss(4)/60);
-  if existf(p,'drot')
-   if isfinite(p.drot)
-    disp([' found drot:',num2str(p.drot),' should be ',num2str(drot)])
-   else
-    p.drot=drot;
-   end
-  else
-   p.drot=drot;
-  end
- end
-end
- 
 
 if existf(f,'ladcpdo')==0
  error([' need file name f.ladcpdo  !!!!! '])
@@ -342,12 +328,26 @@ if length(it)==0
 %  p.time_end=gregoria(l.tim(it(end)));
 end
 
-
-d.soundc=0;
+if existf(p,'poss')
+ if isfinite(sum(p.poss))
+  drot=magdev(p.poss(1)+p.poss(2)/60, p.poss(3)+p.poss(4)/60,0,p.time_start(1));
+  if existf(p,'drot')
+   if isfinite(p.drot)
+    disp([' found drot:',num2str(p.drot),' should be ',num2str(drot)])
+   else
+    p.drot=drot;
+   end
+  else
+   p.drot=drot;
+  end
+ end
+end
+ 
 %
 % rotate for magnetic deviation
 %
 
+d.soundc=0;
 if isfinite(p.drot)
  [d.ru,d.rv]=uvrot(l.u(:,it),l.v(:,it),p.drot);
  [ub,vb]=uvrot(l.ub(it),l.vb(it),p.drot);

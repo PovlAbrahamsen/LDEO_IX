@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D N A V . M 
 %                    doc: Thu Jun 17 18:01:50 2004
-%                    dlm: Thu Feb 18 13:38:50 2016
+%                    dlm: Tue Jan 28 13:24:01 2020
 %                    (c) 2004 ladcp@
-%                    uE-Info: 182 7 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 43 64 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % MODIFICATIONS BY ANT:
@@ -36,6 +36,11 @@
 %   Jan  3, 2011: - changed IGRF11 validity to end of 2015 (from 2010)
 %   Feb 18, 2016: - BUG: geomag year range check bombed in 2016
 %		  - added p.interp_missing_GPS using code provided by Jay Hooper
+%   Sep 14, 2018: - BUG: 2008 code move broke working with single GPS file for entire cruise
+%   Sep  4, 2019: - adapted to GK new magdev.m
+%		  - added p.magdec_source
+%   Jan 28, 2020: - 2008 code move is required because at the loadnav stage p.time_start and
+%		    end reflect the LADCP turn-on and -off times
 
 function [d,p]=loadnav(f,d,p)
 % function [d,p]=loadnav(f,d,p)
@@ -56,6 +61,12 @@ p=setdefv(p,'interp_nav_times',0);
 % INTERPOLATE MISSING GPS VALUES (Jay Hooper)
 p=setdefv(p,'interp_missing_GPS',1);
 
+% MAGNETIC DECLINATION
+%    There are three different sources for magnetic declination
+%	- specify p.drot manually
+%	- p.magdec_source = 1	% use external magdec program, if available, otherwise ...
+%	- p.magdec_source = 2	% use [magdev.m] from Gerd Krahmann
+p=setdefv(p,'magdec_source',2);
 
 % FILE LAYOUT
 f = setdefv(f,'nav_header_lines',0);
@@ -182,6 +193,84 @@ if p.interp_missing_GPS
     end
 end
 
+%----------------------------------------------------------------------
+% The following code was moved into [loadctd.m] in July 2008 to fix a
+% bug that most likely only occurs with elapsed times. In 2018, it was
+% discovered that the bug fix introduced another bug that only affects
+% data sets with a single GPS time series from which the per-station
+% information must be extracted. Therefore, the code was moved back
+% here but only called when not working with elapsed time.
+% In Jan 2020 I realized that the code cannot be here at all, because 
+% p.time_start and end are still the LADCP turn-on and -off times.
+% Therefore, I disabled the code here and re-enabled it for all
+% time bases in [loadctd.m]. I do not remember what bug this now causes.
+%----------------------------------------------------------------------
+
+if 0
+  if min(d.navtime_jul)>max(d.time_jul) | max(d.navtime_jul)<min(d.time_jul)
+    disp('NAV timeseries does not overlap WRONG STATION????')
+    disp(['  NAV-data : ',datestrj(d.navtime_jul(1)),'	to ',datestrj(d.navtime_jul(end))])
+    disp([' ADCP-data : ',datestrj(d.time_jul(1)),'  to ',datestrj(d.time_jul(end))])
+    disp(' will ignore nav data')
+    p.navdata = 0;
+    d.navtime_jul = d.time_jul; % make sure same length
+    d.slat = d.navtime_jul*NaN;
+    d.slon = d.slat;
+  else
+    if d.navtime_jul(1) > d.time_jul(1)
+      disp('NAV timeseries starts after ADCP timeseries: used first NAV value to patch ')
+      disp(['  NAV-data : ',datestrj(d.navtime_jul(1)),'  to ',datestrj(d.navtime_jul(end))])
+      disp([' ADCP-data : ',datestrj(d.time_jul(1)),'  to ',datestrj(d.time_jul(end))])
+      d.navtime_jul(1) = d.time_jul(1);
+    end
+    
+    if d.navtime_jul(end) < d.time_jul(end)
+      disp('NAV timeseries ends before ADCP timeseries: used last NAV value to patch ')
+      disp(['  NAV-data : ',datestrj(d.navtime_jul(1)),'  to ',datestrj(d.navtime_jul(end))])
+      disp([' ADCP-data : ',datestrj(d.time_jul(1)),'  to ',datestrj(d.time_jul(end))])
+      d.navtime_jul(end) = d.time_jul(end);
+    end
+  
+    % find valid
+    ii=find(diff(d.navtime_jul)>0);
+    ii=[ii;length(d.navtime_jul)];
+  
+    % average over p.navtime_av days
+    dt2m=[-p.navtime_av:(1/3600/24):p.navtime_av]';
+    slon=medianan(interp1q(d.navtime_jul(ii),d.slon(ii),julian(p.time_start)+dt2m));
+    slat=medianan(interp1q(d.navtime_jul(ii),d.slat(ii),julian(p.time_start)+dt2m));
+keyboard
+    p.nav_start=[fix(slat), (slat-fix(slat))*60, fix(slon), (slon-fix(slon))*60];
+    elon=medianan(interp1q(d.navtime_jul(ii),d.slon(ii),julian(p.time_end)+dt2m));
+    elat=medianan(interp1q(d.navtime_jul(ii),d.slat(ii),julian(p.time_end)+dt2m));
+    p.nav_end=[fix(elat), (elat-fix(elat))*60, fix(elon), (elon-fix(elon))*60];
+  
+    % interpolate on RDI data
+    % this also shortens vectors to length of d.time_jul, which may be the
+    % only thing that is really needed
+    d.slon=interp1q(d.navtime_jul(ii),d.slon(ii),d.time_jul')';
+    d.slat=interp1q(d.navtime_jul(ii),d.slat(ii),d.time_jul')';
+
+    p.poss = [NaN NaN NaN NaN];
+    p.pose = [NaN NaN NaN NaN];
+  end
+
+  p=setdefv(p,'poss',[NaN NaN NaN NaN]);
+  [slat,slon] = pos2str(p.poss(1)+p.poss(2)/60,p.poss(3)+p.poss(4)/60);
+  disp([' update start pos  from:',slat,'  ',slon])
+  p.poss=p.nav_start;
+  [slat,slon] = pos2str(p.poss(1)+p.poss(2)/60,p.poss(3)+p.poss(4)/60);
+  disp(['			to:',slat,'  ',slon])
+  
+  p=setdefv(p,'pose',[NaN NaN NaN NaN]);
+  [slat,slon] = pos2str(p.pose(1)+p.pose(2)/60,p.pose(3)+p.pose(4)/60);
+  disp([' update end pos    from:',slat,'  ',slon])
+  p.pose=p.nav_end;
+  [slat,slon] = pos2str(p.pose(1)+p.pose(2)/60,p.pose(3)+p.pose(4)/60);
+  disp(['			to:',slat,'  ',slon])
+
+end % if p.navdata
+
 % =================================================================
 % - at this point nav data is in d.navtime_jul, d.slon, d.slat
 %   and p.navdata is set to 1
@@ -189,16 +278,22 @@ end
 %   in [loadctd.m]
 % =================================================================
 
-if ~isfinite(p.drot)		      % set magdecl
- [s,o] = system('magdec');
- if s == 1
-   p.drot = geomag(f,meannan(d.navtime_jul),medianan(d.slat),medianan(d.slon));
- else	 
-   warn = sprintf('"magdec" not found; using old magdev code with IGRF00',f.IGRF);
-   disp(['WARNING: ' warn]);
-   p.warn(size(p.warn,1)+1,1:length(warn))=warn;
-   p.drot = magdev(medianan(d.slat),medianan(d.slon));
+if ~isfinite(p.drot)						% set magdecl
+ if p.magdec_source == 1					% external magdec program
+   [s,o] = system('magdec');
+   if s == 1
+     p.drot = geomag(f,meannan(d.navtime_jul),medianan(d.slat),medianan(d.slon));
+   else    
+     warn = sprintf('"magdec" not found; using magdev Matlab code');
+     disp(['WARNING: ' warn]);
+     p.warn(size(p.warn,1)+1,1:length(warn))=warn;
+   end
  end
+
+ if ~isfinite(p.drot)
+   p.drot = magdev(medianan(d.slat),medianan(d.slon),0,p.time_start(1));
+ end
+
  [d.ru,d.rv]=uvrot(d.ru,d.rv,p.drot);
  [d.bvel(:,1),d.bvel(:,2)]=uvrot(d.bvel(:,1),d.bvel(:,2),p.drot);
  disp(sprintf(' corrected for magnetic declination of %.1f deg',p.drot));

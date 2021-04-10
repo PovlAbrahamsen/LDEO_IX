@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D C T D . M 
 %                    doc: Sat Jun 26 15:56:43 2004
-%                    dlm: Thu May 28 07:51:39 2015
+%                    dlm: Tue Jan 28 13:22:51 2020
 %                    (c) 2004 M. Visbeck & A. Thurnherr
-%                    uE-Info: 169 24 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 94 45 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 function [d,p]=loadctd(f,d,p)
@@ -85,6 +85,13 @@ f = setdefv(f,'ctd_time_base',0);
 %   Mar 21, 2014: - BUG: f.ctd_time_base used p.ctd_time_base set as default
 %   May 27, 2015: - removed confusing diagnostic message regarding adjusting NAV time
 %   May 28, 2015: - added error message when there are no valid vertical velocities
+%   Apr 18, 2018: - BUG: ADCP-time shift warning was meaningless with elapsed time_base
+%   Sep 14, 2018: - BUG: code move in 2008 broke working with single GPS file for entire cruise
+%   Jan 28, 2020: - I don't understand Sep 14, 2018 bug any more; fix for that bug 
+%		    involved moving code to loadnav.m, which does not work because
+%		    during loadnav p.time_start and end are not known (LADCP turn on/off 
+%		    times are used); present code works with SR1b repeat cruises, which
+%	            all have single gps files
 
 % read SEABIRD ctd timeseries file
 disp(['LOADCTD: load CTD time series ',f.ctd])
@@ -439,7 +446,7 @@ if p.ctdmaxlag>0
  if abs(lag)<p.ctdmaxlag & co>p.ctdmincorr
   disp(' adjust ADCP time to CTD time and shift depth record ')
   d.time_jul=d.time_jul+lagdt;
-  if lagdt*24*3600>10
+  if f.ctd_time_base~=0 && lagdt*24*3600>10
    disp('WARNING WARNING WARNING')
    warn=[' shifted ADCP timeseries by ',int2str(lagdt*24*3600),' seconds '];
    disp(warn)
@@ -540,7 +547,7 @@ end
 %	  at this stage
 %----------------------------------------------------------------------
 
-if p.navdata
+if p.navdata %%%&& f.nav_time_base == 0
   if min(d.navtime_jul)>max(d.time_jul) | max(d.navtime_jul)<min(d.time_jul)
     disp('NAV timeseries does not overlap WRONG STATION????')
     disp(['  NAV-data : ',datestrj(d.navtime_jul(1)),'	to ',datestrj(d.navtime_jul(end))])
@@ -649,7 +656,7 @@ function a=datestrj(b)
 % 
 % print julian date string
 %
-a=datestr(b-julian([0 1 0 0 0 0]));
+a=datestr(b-julian([0 1 0 0 0 0]));			
 
 %
 %==============================================================

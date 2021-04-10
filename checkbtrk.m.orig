@@ -5,9 +5,9 @@ function p=checkbtrk(d,di,de,dr,p);
 %======================================================================
 %                    C H E C K B T R K . M 
 %                    doc: Sat Jul  3 23:57:25 2004
-%                    dlm: Wed Sep  4 19:02:39 2019
+%                    dlm: Wed Sep  4 18:19:17 2019
 %                    (c) 2004 ladcp@
-%                    uE-Info: 24 0 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 309 48 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -206,7 +206,7 @@ clf
  subplot(221); hold on;
  plot(ruabe,izm,'.k');			% all velocities
  plot(rua,izm,'.g'); 			% edited velocities
- plot(ruabe(iz),izm(iz),'.r');		% used-for-BT velocities
+ plot(ruabe(iz),izm(iz),'.r');	% used-for-BT velocities
  axis tight;
  ax=axis;
  ax(1:2)=[-1 1]*0.8;
@@ -254,7 +254,7 @@ clf
 
 subplot(222); hold on;
  plot(rvabe,izm,'.k'); 			% all velocities
- plot(rva,izm,'.g'); 			% edited velocities
+ plot(rvabe,izm,'.g'); 			% edited velocities
  plot(rvabe(iz),izm(iz),'.r')		% used-for-BT velocities
  axis tight
  ax=axis;

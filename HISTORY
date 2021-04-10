@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Wed Jan 17 12:19:26 2018
+                    dlm: Wed Sep  4 18:13:56 2019
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 325 17 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 343 0 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -323,4 +323,29 @@ IX_13:
 		- updated version to IX_13 in [default.m] [.hg/hgrc]
 		- commit
 		- publish
-		
+	...
+	Sep 14, 2018:
+		- updated version to IX_14beta in [default.m] [.hg/hgrc]
+		- fixed (without much checking) bug introduced in 2008 code move
+		  from [loadctd.m] to [loadnav.m]
+	...
+	Feb  8, 2019:
+		- added pauses to figure-saving loop, because on TheThinMint
+		  occasionally the wrong figures were saved
+	Feb 16, 2019:
+		- moved post-processing to step 17 to ensure it is done before
+		  results are saved		
+	...
+	Sep  4, 2019:
+		- changed p.btrk_default from 3 to 2
+		- fixed [savearch.m] date bug
+		- swapped in Gerd's code [magdev.m] and made default in [loadnav.m]
+		- modifications suggested by Gerd:
+			- [getinv.m] rounded default ps.dz
+			- [prepinv.m] BUG related to weights
+			- [getbtrack.m] fixed minor typo
+			- [checkbtrk.m] fixed plotting error 
+		- adapted [process_cast.m] to new [calc_shear3.m] from GK
+		- [calc_shear3.m] required some adaptation
+		- updated version in [default.m] to 15beta, skipping 14, which
+		  was used for GO-SHIP work but never published
