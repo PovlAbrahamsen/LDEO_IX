@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D C T D . M 
 %                    doc: Sat Jun 26 15:56:43 2004
-%                    dlm: Tue Jan 28 13:22:51 2020
+%                    dlm: Thu Apr 29 21:44:11 2021
 %                    (c) 2004 M. Visbeck & A. Thurnherr
-%                    uE-Info: 94 45 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 97 69 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 function [d,p]=loadctd(f,d,p)
@@ -92,6 +92,9 @@ f = setdefv(f,'ctd_time_base',0);
 %		    during loadnav p.time_start and end are not known (LADCP turn on/off 
 %		    times are used); present code works with SR1b repeat cruises, which
 %	            all have single gps files
+%   Apr 29, 2021: - disable use of bin-1 data for integration of w; this was necessitated
+%		    by A22 030, which is a shallow profile where bin 1 of the on-deck DL 
+%	 	    data seems valid, messing up the zmax calculation
 
 % read SEABIRD ctd timeseries file
 disp(['LOADCTD: load CTD time series ',f.ctd])
@@ -172,7 +175,16 @@ if p.interp_ctd_times
 end
 
 % calc LADCP depth
-w=meannan(d.rw);
+%	- don't use bin 1, which is contaminated by ringing
+%	  when zero blanking is used 
+
+if length(d.zu)>0 && length(d.zd)>0					% dual-head system
+  w = meannan(d.rw([1:(p.nbin_d-1),(end-p.nbin_u+1):end],:));
+elseif length(d.zu)>0							% uplooker only(?)
+  w = meannan(d.rw([(end-p.nbin_u+1):end],:));
+else
+  w = meannan(d.rw([1:(p.nbin_d-1)],:));				% downlooker only
+end
 if sum(isfinite(w)) == 0
     error('No valid vertical velocities --- aborting');
 end

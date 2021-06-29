@@ -1,9 +1,9 @@
 %======================================================================
-%                    D E F A U L T . M 
+%                    C U R R E N T / D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Wed Sep  4 18:10:56 2019
+%                    dlm: Mon Jun 28 13:07:28 2021
 %                    (c) 2004 ladcp@
-%                    uE-Info: 26 48 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 44 46 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -23,7 +23,9 @@
 %	Mar 29, 2017: - added saveplot_pdf
 %	Jan 17, 2018: - changed ersion to IX_13 and published
 %	Sep  4, 2019: - changed p.btrk_mode from 3 to 2 (own only)
-%			      - updated to version IX_15beta
+%			      - updated to version IX_14beta
+%	???			  - updated to version IX_14beta2
+%	Jun 28, 2021: - updated version to IX_14
 
 % LADCP processing software
 % M. Visbeck. LDEO/2003
@@ -39,7 +41,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_14beta2';
+p.software='LDEO LADCP software: Version IX_14';
 
 % file names
 % f.ladcpdo  is the ONLY required input

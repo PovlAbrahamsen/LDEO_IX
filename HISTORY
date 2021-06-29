@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Wed Sep  4 18:13:56 2019
+                    dlm: Tue Jun 29 09:14:14 2021
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 343 0 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 370 10 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -323,22 +323,29 @@ IX_13:
 		- updated version to IX_13 in [default.m] [.hg/hgrc]
 		- commit
 		- publish
-	...
+
+
+IX_14:
 	Sep 14, 2018:
 		- updated version to IX_14beta in [default.m] [.hg/hgrc]
 		- fixed (without much checking) bug introduced in 2008 code move
-		  from [loadctd.m] to [loadnav.m]
-	...
+		  from [loadctd.m] to [loadnav.m] (had to be undone in 2020)
+	Sep 15, 2018:
+		- [process_cast.m] disabled serial-number code
+
 	Feb  8, 2019:
 		- added pauses to figure-saving loop, because on TheThinMint
 		  occasionally the wrong figures were saved
 	Feb 16, 2019:
 		- moved post-processing to step 17 to ensure it is done before
 		  results are saved		
-	...
+	Aug 30, 2019:
+		- changed error message about p.getdepth in process_cast.m
+		- BUG: missing pressure values cause problem in output [getdpthi.m]
 	Sep  4, 2019:
+		- MAY HAVE UPDATED VERSION TO 15beta AND LATER RETURNED TO 14beta2
 		- changed p.btrk_default from 3 to 2
-		- fixed [savearch.m] date bug
+		- fixed [savearch.m] date bug reported by EF
 		- swapped in Gerd's code [magdev.m] and made default in [loadnav.m]
 		- modifications suggested by Gerd:
 			- [getinv.m] rounded default ps.dz
@@ -347,5 +354,17 @@ IX_13:
 			- [checkbtrk.m] fixed plotting error 
 		- adapted [process_cast.m] to new [calc_shear3.m] from GK
 		- [calc_shear3.m] required some adaptation
-		- updated version in [default.m] to 15beta, skipping 14, which
-		  was used for GO-SHIP work but never published
+
+	Jan 27, 2020:
+		- BUG: btmi was set to nan for JR195 stations 20 and 30;
+               fixed by skipping sub-plots if btmi is not finite in [geterr.m]
+		- had to undo Sep 14, 2018 bug "fix" in [loadctd.m] [loadnav.m]
+		- [loadrdi.m] moved magdev call further back, where start time is known
+
+	Apr 29, 2021:
+		- disable use of bin-1 data for integration of w; this was necessitated
+		  by A22 030, which is a shallow profile where bin 1 of the on-deck DL
+          data seems valid, messing up the zmax calculation
+
+	Jun 29, 2021:
+		- published IX_14
