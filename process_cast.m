@@ -40,9 +40,9 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %======================================================================
 %                    P R O C E S S _ C A S T . M 
 %                    doc: Thu Jun 24 16:54:23 2004
-%                    dlm: Wed Sep  4 17:59:11 2019
+%                    dlm: Fri Nov 19 12:24:23 2021
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 467 12 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 97 9 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % NOTES:
@@ -94,6 +94,8 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %		   is done before results are saved
 %  Aug 30, 2019: - changed error message about p.getdepth
 %  Sep  4, 2019: - replaced [getshear2.m] by GK's new [calc_shear3.m]
+%  Nov 19, 2021: - cosmetics
+% HISTORY END
 
 %----------------------------------------------------------------------
 % STEP 0: EXECUTE ALWAYS
@@ -297,7 +299,7 @@ if pcs.begin_step <= pcs.cur_step
   if p.getdepth==2
    [d,p]=getdpthi(d,p);
    if length(find(~isfinite(d.izm(1,:))))
-     error('Missing values in d.izm --- likely missing values in CTD file (processing with p.getdepth = 1; might work');
+     error('Missing values in d.izm --- likely missing values in CTD file (processing with p.getdepth = 1; might work)');
    end
   else
    [d,p]=getdpth(d,p);

@@ -1,14 +1,15 @@
 %======================================================================
 %                    G E T D P T H I . M 
 %                    doc: Wed Jan  7 16:25:26 2009
-%                    dlm: Fri Aug 30 12:40:38 2019
+%                    dlm: Fri Nov 19 12:24:59 2021
 %                    (c) 2009 A.M. Thurnherr
-%                    uE-Info: 12 0 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 13 0 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
 %   Jan  7, 2009: - tightened use of exist()
 %	Aug 30, 2019: - BUG: missing pressure values cause problem in output
+%	Nov 19, 2021: - added error message
 
 function [d,p]=getdpthi(d,p)
 % function [d,p]=getdpthi(d,p)
@@ -226,6 +227,9 @@ for n=1:n2
    disp(' use CTD time series depth, will not do depth inversion ')
    disp([' LADCP minus CTD depth mean: ',num2str(p.ladcpr_CTD_depth_std(1)),...
           '  std: ',num2str(p.ladcpr_CTD_depth_std(2))]);
+   if ~isfinite(p.ladcpr_CTD_depth_std(1))
+	error('non-numeric result, try reprocessing with p.getdepth = 1');
+   end
    p.ladcpdepth=0;
   end
 
