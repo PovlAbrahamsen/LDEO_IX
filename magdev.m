@@ -31,22 +31,19 @@ function  [dev,d,h,i,f,x,y,z]=magdev(flat,flon,elevkm,year);
 %======================================================================
 %                    M A G D E V . M 
 %                    doc: Wed Sep  4 18:17:31 2019
-%                    dlm: Wed Sep  4 18:18:16 2019
+%                    dlm: Mon May 22 10:53:30 2023
 %                    (c) 2019 G. Krahmann
-%                    uE-Info: 40 49 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 47 0 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
-
 % CHANGES BY ANT:
-%   SEp  4, 2019: - changed sin/cos_d to sin/cosd
-
+%   Sep  4, 2019: - changed sin/cos_d to sin/cosd
+%   May 22, 2023: - adapted to IGRF13
 
 %
 % read the coefficients
 %
-fname = 'igrf12coeffs.xls';
-warning off			% avoid non-sensical warning in >=R14
+fname = 'IGRF13coeffs.xlsx';
 gh = xlsread(fname);
-warning on
 
 
 %
@@ -304,3 +301,4 @@ else
   end;
 end;
 return;
+

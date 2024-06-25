@@ -1,9 +1,9 @@
 %======================================================================
 %                    C U R R E N T / D E F A U L T . M 
 %                    doc: Sat Jun 26 06:10:09 2004
-%                    dlm: Mon Jun 28 13:07:28 2021
+%                    dlm: Tue Jun 25 12:11:00 2024
 %                    (c) 2004 ladcp@
-%                    uE-Info: 44 46 NIL 0 0 72 0 2 4 NIL ofnI
+%                    uE-Info: 46 46 NIL 0 0 72 0 2 4 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT:
@@ -26,6 +26,8 @@
 %			      - updated to version IX_14beta
 %	???			  - updated to version IX_14beta2
 %	Jun 28, 2021: - updated version to IX_14
+%	Nov 24, 2022: - updated to IX_15beta
+%	Jun 25, 2024: - updated to IX_15
 
 % LADCP processing software
 % M. Visbeck. LDEO/2003
@@ -41,7 +43,7 @@
 %             the data
 % structure ps.??? contains parameter for the solution
 % structure att.??? contains attributes
-p.software='LDEO LADCP software: Version IX_14';
+p.software='LDEO LADCP software: Version IX_15';
 
 % file names
 % f.ladcpdo  is the ONLY required input

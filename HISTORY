@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Tue Jun 29 09:14:14 2021
+                    dlm: Tue Jun 25 12:16:10 2024
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 370 10 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 391 43 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -368,3 +368,24 @@ IX_14:
 
 	Jun 29, 2021:
 		- published IX_14
+
+----------------------------------------------------------------------
+
+IX_15beta:
+	Nov 24, 2022:
+		- updated version to IX_15beta in [default.m]
+	May  3, 2023:
+		- [loadctd.m]: added removal of missing values in CTD file when
+		  p.interp_ctd_times is set (default)
+	May 11, 2023:
+		- updated version to IX_15beta in [.hg/hgrc]
+		- [edit_data.m]: added p.edit_depths to deal with partial depth
+  		  processing 
+	May 22, 2023:
+		- [magdev.m]: updaged to IGRF13
+	Jun 25, 2024:
+		- [loadrdi.m] [process_cast.m]: BUG: BT data was used during
+		  processing of UL-only profile
+		- [current/default.m] [current/.hg/hgrc]: updated version to IX_15
+		- udpated howto on overleaf & copied as indicated in [README.Publish]
+		- hg commit (IX_15 Release Version)

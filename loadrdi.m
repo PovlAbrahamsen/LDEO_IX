@@ -13,9 +13,9 @@ function [d,p,de]=loadrdi(f,p)
 %======================================================================
 %                    L O A D R D I . M 
 %                    doc: Fri Jun 18 18:21:56 2004
-%                    dlm: Mon Jan 27 18:41:35 2020
+%                    dlm: Tue Jun 25 10:46:50 2024
 %                    (c) 2004 ladcp@
-%                    uE-Info: 54 98 NIL 0 0 72 2 2 8 NIL ofnI
+%                    uE-Info: 55 74 NIL 0 0 72 2 2 8 NIL ofnI
 %======================================================================
 
 % CHANGES BY ANT
@@ -52,6 +52,7 @@ function [d,p,de]=loadrdi(f,p)
 %  Feb 23, 2016: - clarified header id error message
 %  Jan 27, 2020: - moved magdev call further back, where start time is known
 %		   (with GK's new magdev code, this howto is miraculously correct again - I think)
+%  Jun 25, 2024: - BUG: RDI BT data were used when processing only UL data
 
 % p=setdefv(p,'pg_save',[1 2 3 4]);
 % Default =3 for loadctd_whoi.
@@ -761,10 +762,17 @@ dproblem(i) = dproblem(i) + 10000;
 i = find( isnan(veld(:,:,1)) );
 dproblem(i) = dproblem(i) + 100000;
 
+l.warn=('LADCP WARNINGS');
+l.btrk_used = 0;
 if sum(isfinite(btd(:)))>0
- l.btrk_used = 1;
-else
- l.btrk_used = 0;
+  [dummy,db]=rditype(fdown);
+  if db.Up
+    warn=(' Warning: ignoring RDI bottom track data from upward-looking instrument');
+    disp(warn)
+    l.warn(size(l.warn,1)+1,1:length(warn))=warn;
+  else    
+    l.btrk_used = 1;
+  end
 end
 
 % transform to earth coordinates
@@ -875,7 +883,6 @@ end
 if bmax(1)>0, fd(f.nbin)=bmax(1); end
 idb=1:fd(f.nbin);
 
-l.warn=('LADCP WARNINGS');
 if up
    if bmax(2)>0, fu(f.nbin)=bmax(2); end
    iub=1:fu(f.nbin);

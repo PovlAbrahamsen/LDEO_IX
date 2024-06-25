@@ -40,9 +40,9 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %======================================================================
 %                    P R O C E S S _ C A S T . M 
 %                    doc: Thu Jun 24 16:54:23 2004
-%                    dlm: Fri Nov 19 12:24:23 2021
+%                    dlm: Tue Jun 25 11:00:15 2024
 %                    (c) 2004 A.M. Thurnherr
-%                    uE-Info: 97 9 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 98 66 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 % NOTES:
@@ -95,6 +95,7 @@ function [] = process_cast(stn,begin_step,stop,eval_expr)
 %  Aug 30, 2019: - changed error message about p.getdepth
 %  Sep  4, 2019: - replaced [getshear2.m] by GK's new [calc_shear3.m]
 %  Nov 19, 2021: - cosmetics
+%  Jun 25, 2024: - changed Step 4 to discard BT velocities from UL
 % HISTORY END
 
 %----------------------------------------------------------------------
@@ -229,22 +230,27 @@ pcs.cur_step = pcs.cur_step + 1;
 if pcs.begin_step <= pcs.cur_step
   pcs.step_name = 'GET BOTTOM-TRACK DATA'; begin_processing_step;
 
-  %  Check if hbot values are mostly ==0
-  %
-  %  some RDI instruments seem to have trouble reporting the distance of the bottom
-  %  despite giving reasonable bottom track values.
-  %  If this problem is diagnosed we make the distance ourselves.
-  %
-  ii1=sum(isfinite(d.hbot));
-  ii0=sum(d.hbot==0);
-  p.hbot_0=ii0/(ii1+1)*100;
-  
-  if p.hbot_0>80 
-   p.bottomdist=1;
-   disp([' WARNING found ',int2str(p.hbot_0),'% of  hbot=0  WARNING'])
+    %  Check if hbot values are mostly ==0
+    %
+    %  some RDI instruments seem to have trouble reporting the distance of the bottom
+    %  despite giving reasonable bottom track values.
+    %  If this problem is diagnosed we make the distance ourselves.
+    %
+    ii1=sum(isfinite(d.hbot));
+    ii0=sum(d.hbot==0);
+    p.hbot_0=ii0/(ii1+1)*100;
+    
+    if p.hbot_0>80 
+     p.bottomdist=1;
+     disp([' WARNING found ',int2str(p.hbot_0),'% of  hbot=0  WARNING'])
+    end
+    
+    [d,p]=getbtrack(d,p);  
+
+  if d.down.Up
+    disp(' discarding apparent bottom-track velocities from uplooker');
+    d.bvel(find(isfinite(d.bvel))) = NaN;
   end
-  
-  [d,p]=getbtrack(d,p);  
 
   end_processing_step;
 end % OF STEP 4: GET BOTTOM-TRACK DATA

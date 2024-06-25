@@ -1,9 +1,9 @@
 %======================================================================
 %                    L O A D C T D . M 
 %                    doc: Sat Jun 26 15:56:43 2004
-%                    dlm: Thu Apr 29 21:44:11 2021
+%                    dlm: Tue May  2 11:51:23 2023
 %                    (c) 2004 M. Visbeck & A. Thurnherr
-%                    uE-Info: 97 69 NIL 0 0 72 0 2 8 NIL ofnI
+%                    uE-Info: 100 31 NIL 0 0 72 0 2 8 NIL ofnI
 %======================================================================
 
 function [d,p]=loadctd(f,d,p)
@@ -95,6 +95,9 @@ f = setdefv(f,'ctd_time_base',0);
 %   Apr 29, 2021: - disable use of bin-1 data for integration of w; this was necessitated
 %		    by A22 030, which is a shallow profile where bin 1 of the on-deck DL 
 %	 	    data seems valid, messing up the zmax calculation
+%   May  3, 2023: - added removal of missing values in CTD file if p.interp_ctd_times is
+%		    set (default); before this change, no missing values (nan) were allowed
+%		    in CTD data
 
 % read SEABIRD ctd timeseries file
 disp(['LOADCTD: load CTD time series ',f.ctd])
@@ -165,6 +168,20 @@ data=A([i_press i_temp i_salin],:)';
 
 % interpolate to regular time series
 if p.interp_ctd_times
+  A = rmmissing(A,2);							% remove columns (depths) with missing data
+  if length(A) < length(timctd)
+    disp(sprintf(' removed %d CTD scans with missing values',...
+    		length(timctd)-length(A)))
+  end
+
+  timctd=A(i_time,:)';							% update timctd
+  switch f.ctd_time_base
+    case 0 % elapsed time in seconds
+      timctd = timctd/24/3600 + julian(p.time_start);
+    case 1 % year-day
+      timctd = timctd + julian([p.time_start(1) 1 0 0 0 0]);
+  end
+
   min_t = min(timctd);
   max_t = max(timctd);
   delta_t = median(diff(timctd));
