@@ -1,9 +1,9 @@
 ======================================================================
                     H I S T O R Y 
                     doc: Tue Aug 16 11:41:46 2005
-                    dlm: Tue Jun 25 12:16:10 2024
+                    dlm: Tue Jun 25 12:18:15 2024
                     (c) 2005 A.M. Thurnherr
-                    uE-Info: 391 43 NIL 0 0 72 3 2 4 NIL ofnI
+                    uE-Info: 395 70 NIL 0 0 72 3 2 4 NIL ofnI
 ======================================================================
 
 NB: CHANGE VERSION IN [default.m] BEFORE UPLOADING
@@ -387,5 +387,9 @@ IX_15beta:
 		- [loadrdi.m] [process_cast.m]: BUG: BT data was used during
 		  processing of UL-only profile
 		- [current/default.m] [current/.hg/hgrc]: updated version to IX_15
-		- udpated howto on overleaf & copied as indicated in [README.Publish]
+		- udpated howto on overleaf & copied as indicated in
+		  [../README.Publish] 
 		- hg commit (IX_15 Release Version)
+        - published
+
+----------------------------------------------------------------------        
